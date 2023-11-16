@@ -16,7 +16,7 @@ export class AppComponent {
   title = 'ShoppingList.Angular';
 
   constructor(private http: HttpClient) {
-    var httpOptions = {
+    const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'text/html, application/xhtml+xml, */*',
         'Content-Type': 'application/x-www-form-urlencoded'
@@ -24,7 +24,7 @@ export class AppComponent {
       responseType: 'text' as 'json'
     };
 
-    this.http.get<string>('http://localhost:7071/api/AppInfo?name=Roger', httpOptions).pipe(
+    this.http.get<string>('/api/AppInfo?name=Roger', httpOptions).pipe(
       tap((resp) => {
         console.log(resp);
         this.message = resp;
