@@ -2,8 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
-import { catchError, of, tap } from 'rxjs';
-import { AuthResult, CurrentUser } from './shared/models/model';
+import { map, of, tap } from 'rxjs';
+import { AuthResult } from './shared/models/model';
+import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-root',
@@ -13,25 +14,24 @@ import { AuthResult, CurrentUser } from './shared/models/model';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
-  currentUser: CurrentUser = { userId: '', userRoles: [], identityProvider: '', userDetails: '', claims: [] };
+  currentUser = toSignal(this.getUser(), { initialValue: { userId: '', userRoles: [], identityProvider: '', userDetails: '', claims: [] }, requireSync: false});
+  $appInfo = of('Processing...');
   message = '';
   title = 'ShoppingList.Angular';
 
   constructor(private http: HttpClient) {
-    this.http.get<AuthResult>('/.auth/me').pipe(
-      tap((authResult) => {
-        console.log(authResult);
-        this.currentUser = authResult.clientPrincipal;
-        this.getAppInfo();
-      }),
-      catchError((err) => {
-        console.error(err.error.error.message);
-        return of('Error');
-      }),
-    ).subscribe();
   }
 
-  private getAppInfo() {
+  private getUser() {
+    return this.http.get<AuthResult>('/.auth/me').pipe(
+      map((authResult) => authResult.clientPrincipal || { userId: '', userRoles: [], identityProvider: '', userDetails: '', claims: [] }),
+      tap((currentUser) => {
+        this.$appInfo = this.getAppInfo(currentUser.userDetails);
+      }),
+    );
+  }
+
+  private getAppInfo(emailAddress: string) {
     const httpOptions = {
       headers: new HttpHeaders({
         'Accept': 'text/html, application/xhtml+xml, */*',
@@ -40,16 +40,6 @@ export class AppComponent {
       responseType: 'text' as 'json'
     };
 
-    this.http.get<string>(`/api/AppInfo?name=${this.currentUser.userDetails}`, httpOptions).pipe(
-      tap((resp) => {
-        console.log(resp);
-        this.message = resp;
-      }),
-      catchError((err) => {
-        console.error(err.error.error.message);
-        return of('Error');
-      }),
-    ).subscribe();
-
+    return this.http.get<string>(`/api/AppInfo?name=${emailAddress}`, httpOptions);
   }
 }
