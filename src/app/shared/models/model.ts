@@ -7,5 +7,5 @@ export interface CurrentUser {
 }
 
 export interface AuthResult {
-  clientPrincipal: CurrentUser;
+  clientPrincipal?: CurrentUser;
 }
