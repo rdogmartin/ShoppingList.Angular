@@ -1,4 +1,4 @@
-namespace Api.Dto;
+﻿namespace Api.Dto;
 
 /// <summary>
 /// Represents Application information
