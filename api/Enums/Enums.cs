@@ -1,12 +1,11 @@
-namespace Api.Enums
+﻿namespace Api.Enums;
+
+public enum Environment
 {
-  public enum Environment
-  {
     Unknown,
     Local,
     Development,
     Test,
     UAT,
     Production
-  }
 }
