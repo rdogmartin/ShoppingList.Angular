@@ -80,11 +80,23 @@
           "options": {
             "buildTarget": "ShoppingList.Angular:build"
           }
+        },
+        "lint": {
+          "builder": "@angular-eslint/builder:lint",
+          "options": {
+            "lintFilePatterns": [
+              "src/**/*.ts",
+              "src/**/*.html"
+            ]
+          }
         }
       }
     }
   },
   "cli": {
-    "analytics": "6aa4098c-7061-4c19-9445-fb8e2b5f4ad0"
+    "analytics": "6aa4098c-7061-4c19-9445-fb8e2b5f4ad0",
+    "schematicCollections": [
+      "@angular-eslint/schematics"
+    ]
   }
 }
