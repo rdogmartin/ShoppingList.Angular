@@ -6,6 +6,8 @@
   },
   "scripts": {
     "ng": "ng",
+    "start:swa": "npx swa start",
+    "start:swa-no-api": "npx swa start http://localhost:4200 --run \"npm start\" --api-devserver-url http://localhost:7135/",
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",

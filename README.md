@@ -1,27 +1,21 @@
-# ShoppingListAngular
+# ShoppingList.Angular
+
+A simple shopping list app built with Angular and Azure Static Web Apps. Uses Azure Functions for the API backend.
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.0.0.
 
-## Development server
+## Running
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Use the Static Web Apps CLI to run this code. Read more at https://azure.github.io/static-web-apps-cli/
 
-## Code scaffolding
+Run `npx swa start` to run both the front and back end pieces, then navigate to http://localhost:4280. Note that any breakpoints
+you set in the C# code will not be hit.
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+To allow debugging the API services and support hot reload, Open api.csproj in Visual Studio and start a debugging session. It is 
+expected this will start the API on port 7135 (http://localhost:7135/).
 
-## Build
+Then run this command in a VSCode terminal:
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+`npx swa start http://localhost:4200 --run "npm start" --api-devserver-url http://localhost:7135/`
 
-## Running unit tests
-
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
-
-## Running end-to-end tests
-
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+Or use the shortcut defined in package.json: `npm run start:swa-no-api`
