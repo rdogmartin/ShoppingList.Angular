@@ -9,3 +9,7 @@ export interface CurrentUser {
 export interface AuthResult {
   clientPrincipal?: CurrentUser;
 }
+
+export interface AppInfo {
+  versionNumber: string;
+}

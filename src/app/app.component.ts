@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
-import { map, of, tap } from 'rxjs';
-import { AuthResult } from './shared/models/model';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { map } from 'rxjs';
+import { AppInfo, AuthResult } from './shared/models/model';
 import { toSignal } from '@angular/core/rxjs-interop';
 
 @Component({
@@ -15,7 +15,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 })
 export class AppComponent {
   currentUser = toSignal(this.getUser(), { initialValue: { userId: '', userRoles: [], identityProvider: '', userDetails: '', claims: [] }, requireSync: false});
-  $appInfo = of('Processing...');
+  appInfo = toSignal(this.getAppInfo());
   message = '';
   title = 'ShoppingList.Angular';
 
@@ -25,21 +25,10 @@ export class AppComponent {
   private getUser() {
     return this.http.get<AuthResult>('/.auth/me').pipe(
       map((authResult) => authResult.clientPrincipal || { userId: '', userRoles: [], identityProvider: '', userDetails: '', claims: [] }),
-      tap((currentUser) => {
-        this.$appInfo = this.getAppInfo(currentUser.userDetails);
-      }),
     );
   }
 
-  private getAppInfo(emailAddress: string) {
-    const httpOptions = {
-      headers: new HttpHeaders({
-        'Accept': 'text/html, application/xhtml+xml, */*',
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }),
-      responseType: 'text' as 'json'
-    };
-
-    return this.http.get<string>(`/api/AppInfo?name=${emailAddress}`, httpOptions);
+  private getAppInfo() {
+    return this.http.get<AppInfo>('/api/AppInfo');
   }
 }
