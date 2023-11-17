@@ -1,21 +1,29 @@
 {
   "root": true,
-  "ignorePatterns": [
-    "projects/**/*", "*.spec.ts"
-  ],
+  "ignorePatterns": ["projects/**/*", "*.spec.ts"],
+  "plugins": ["prettier", "jest"],
   "overrides": [
     {
-      "files": [
-        "*.ts"
-      ],
+      "files": ["*.ts"],
       "extends": [
         "eslint:recommended",
         "plugin:@typescript-eslint/recommended",
         "plugin:@angular-eslint/recommended",
-        "plugin:@angular-eslint/template/process-inline-templates"
+        "plugin:@angular-eslint/template/process-inline-templates",
+        "plugin:jest/recommended",
+        "plugin:jest/style"
       ],
       "rules": {
         "no-console": 1,
+        "prettier/prettier": [
+          "error",
+          {
+            "__comment": "These prettier settings are not visible to the VSCode extension 'Prettier - Code formatter', so they are repeated in .prettierrc. Be sure to keep these settings in sync.",
+            "endOfLine": "auto",
+            "printWidth": 120,
+            "trailingComma": "all"
+          }
+        ],
         "@angular-eslint/directive-selector": [
           "error",
           {
@@ -31,17 +39,18 @@
             "prefix": "app",
             "style": "kebab-case"
           }
+        ],
+        "jest/expect-expect": [
+          "error",
+          {
+            "assertFunctionNames": ["expect", "verify"]
+          }
         ]
       }
     },
     {
-      "files": [
-        "*.html"
-      ],
-      "extends": [
-        "plugin:@angular-eslint/template/recommended",
-        "plugin:@angular-eslint/template/accessibility"
-      ],
+      "files": ["*.html"],
+      "extends": ["plugin:@angular-eslint/template/recommended", "plugin:@angular-eslint/template/accessibility"],
       "rules": {}
     }
   ]

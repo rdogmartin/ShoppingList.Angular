@@ -1,0 +1,6 @@
+{
+  "__comment": "This file is used by the VSCode extension 'Prettier - Code formatter' to apply prettier formatting through the IDE. The linter uses the prettier settings in eslintrc.json. Be sure to keep these settings in sync.",
+  "endOfLine": "auto",
+  "printWidth": 120,
+  "trailingComma": "all"
+}
