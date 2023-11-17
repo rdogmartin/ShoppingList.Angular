@@ -1,0 +1,20 @@
+module.exports = {
+  preset: 'jest-preset-angular',
+  setupFilesAfterEnv: ['<rootDir>/setup-jest.ts'],
+  moduleDirectories: ['node_modules', __dirname],
+  collectCoverage: true,
+  collectCoverageFrom: ['src/**/*.ts'],
+  coverageReporters: ['text', 'cobertura'],
+  coveragePathIgnorePatterns: [
+    '/src/.*\\.(mock.ts|spec.ts|module.ts|routing.ts|d.ts)$',
+    '/src/main.ts',
+    '/src/app/modules/demo/.*',
+    '/src/app/shared/repositories/.*',
+    '/src/app/shared/services/auth.config.service',
+    '/src/app/utils/injection-tokens.ts',
+    '/src/assets/.*',
+    '/src/environments/.*',
+  ],
+  testMatch: ['**/?*.spec.ts'],
+  testPathIgnorePatterns: ["/node_modules/", "cypress"],
+};
