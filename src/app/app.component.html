@@ -1,10 +1,1 @@
-<h1>Hello, {{currentUser().userDetails}}!</h1>
-<p>v{{appInfo()?.versionNumber}}</p>
-
-@if (currentUser().userId) {
-<p><a href="/.auth/logout">Log out</a></p>
-} @else {
-<p><a href="/.auth/login/aad">Log in</a></p>
-}
-
 <router-outlet></router-outlet>
