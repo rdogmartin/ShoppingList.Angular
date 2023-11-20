@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../shared/services/auth.service';
+import { Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { MatCheckboxModule } from '@angular/material/checkbox';
+import { AuthService } from '../../shared/services/auth.service';
 
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, MatCheckboxModule],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
 })
