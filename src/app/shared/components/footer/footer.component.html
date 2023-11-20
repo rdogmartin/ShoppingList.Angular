@@ -1,3 +1,10 @@
 <footer class="p-1">
-  <p>Version {{appInfo()?.versionNumber}}</p>
+  <p>
+    @if (isLoggedIn$()) {
+    <a href="/.auth/logout" class="my-2 px-2 hover:bg-slate-100 dark:hover:bg-slate-700">Log out</a>
+    } @else {
+    <a href="/.auth/login/aad" class="my-2 px-2 hover:bg-slate-100 dark:hover:bg-slate-700">Log in</a>
+    }
+    | <span class="pl-2">Version {{appInfo$()?.versionNumber}}</span>
+  </p>
 </footer>

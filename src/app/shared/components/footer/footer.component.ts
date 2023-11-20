@@ -1,8 +1,9 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
-import { AppInfo } from '../../models/model';
+import { HttpClientModule } from '@angular/common/http';
+import { Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { AppInfoService } from '../../services/appInfo.service';
+import { AuthService } from '../../services/auth.service';
 
 @Component({
   selector: 'app-footer',
@@ -12,11 +13,11 @@ import { toSignal } from '@angular/core/rxjs-interop';
   styleUrl: './footer.component.scss',
 })
 export class FooterComponent {
-  appInfo = toSignal(this.getAppInfo());
+  appInfo$ = toSignal(this.appInfoService.getAppInfo());
+  isLoggedIn$ = toSignal(this.authService.isLoggedIn$);
 
-  constructor(private http: HttpClient) {}
-
-  private getAppInfo() {
-    return this.http.get<AppInfo>('/api/AppInfo');
-  }
+  constructor(
+    private appInfoService: AppInfoService,
+    private authService: AuthService,
+  ) {}
 }
