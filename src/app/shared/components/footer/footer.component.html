@@ -1,10 +1,17 @@
 <footer class="p-1">
-  <p>
+  <p class="p-3 flex items-center font-semibold">
+    @if (!isLoggedIn$()) {
+    <a href="/.auth/login/aad" class="border d-block m-2 p-3 border-[#8c8c8c] bg-white text-black hover:bg-slate-200">
+      <img src="assets/images/microsoft.svg" alt="Microsoft Logo" class="w-4 h-4 inline-block mr-2" style="width:21px;height:21px;" />
+      Sign in with Microsoft
+    </a>
+    }
+  </p>
+  <p class="pt-3">
     @if (isLoggedIn$()) {
     <a href="/.auth/logout" class="my-2 px-2 hover:bg-slate-100 dark:hover:bg-slate-700">Log out</a>
-    } @else {
-    <a href="/.auth/login/aad" class="my-2 px-2 hover:bg-slate-100 dark:hover:bg-slate-700">Log in</a>
+    <span class="pr-2">|</span>
     }
-    | <span class="pl-2">Version {{appInfo$()?.versionNumber}}</span>
+    Version {{appInfo$()?.versionNumber}}
   </p>
 </footer>
