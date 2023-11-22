@@ -13,3 +13,9 @@ export interface AuthResult {
 export interface AppInfo {
   versionNumber: string;
 }
+
+export interface ListItem {
+  id: number;
+  description: string;
+  isComplete: boolean;
+}

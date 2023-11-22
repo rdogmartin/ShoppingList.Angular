@@ -1,4 +1,5 @@
 <p>Hello, {{currentUser().userDetails}}!</p>
 
-<p><mat-checkbox>Carrots</mat-checkbox></p>
-<p><mat-checkbox>Milk</mat-checkbox></p>
+@for (listItem of listItems(); track listItem.id) {
+<p><mat-checkbox>{{ listItem.description }}</mat-checkbox></p>
+}

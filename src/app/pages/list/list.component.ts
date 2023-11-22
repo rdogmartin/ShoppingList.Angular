@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AuthService } from '../../shared/services/auth.service';
+import { ListItemService } from '../../shared/services/listItem.service';
 
 @Component({
   selector: 'app-list',
@@ -17,5 +18,10 @@ export class ListComponent {
     requireSync: false,
   });
 
-  constructor(private authService: AuthService) {}
+  listItems = toSignal(this.listItemService.getListItems(), { initialValue: [], requireSync: false });
+
+  constructor(
+    private authService: AuthService,
+    private listItemService: ListItemService,
+  ) {}
 }
