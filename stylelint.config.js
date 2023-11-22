@@ -12,6 +12,7 @@ module.exports = {
       {
         ignoreAtRules: [
           "apply",
+          "forward",
           "include",
           "responsive",
           "screen",

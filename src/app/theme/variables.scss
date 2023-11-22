@@ -1,0 +1,168 @@
+:root {
+  --primary-50: #e6f1f6;
+  --primary-100: #cce3ee;
+  --primary-200: #b3d6e5;
+  --primary-300: #99c8dd;
+  --primary-400: #80bad4;
+  --primary-500: #66accb;
+  --primary-600: #4d9ec3;
+  --primary-700: #3391ba;
+  --primary-800: #1a83b2;
+  --primary-900: #0075a9;
+  --primary-a100: #f7fcff;
+  --primary-a200: #c4e9ff;
+  --primary-a300: #91d6ff;
+  --primary-a700: #78cdff;
+
+  --accent-50: #fef2e5;
+  --accent-100: #fee0bd;
+  --accent-200: #fdcb91;
+  --accent-300: #fcb665;
+  --accent-400: #fba644;
+  --accent-500: #fa9623;
+  --accent-600: #f98e1f;
+  --accent-700: #f9831a;
+  --accent-800: #f87915;
+  --accent-900: #f6680c;
+  --accent-a100: #ffffff;
+  --accent-a200: #fff3ed;
+  --accent-a400: #ffd2ba;
+  --accent-a700: #ffc2a1;
+}
+
+$light-primary-palette: (
+  50: var(--primary-50),
+  100: var(--primary-100),
+  200: var(--primary-200),
+  300: var(--primary-300),
+  400: var(--primary-400),
+  // Angular Material (AM) v15 workaround: Hard code a color instead of using a CSS variable. We also specify a darker color
+  // than what we had (the --primary-500 variable is set to #66accb) because starting in v15, Angular Materials calculates
+  // the text color as either white or black to provide the greatest contrast to the color specified here, and we want to ensure
+  // white text. The AM team is rewriting how theming works, which is expected in v17 or later. Revisit this workaround at that time.
+  // https://github.com/angular/components/issues/26153
+  500: #3391ba,
+  600: var(--primary-600),
+  700: var(--primary-700),
+  800: var(--primary-800),
+  900: var(--primary-900),
+  A100: var(--primary-a100),
+  A200: var(--primary-a200),
+  A400: var(--primary-a300),
+  A700: var(--primary-a700),
+  contrast: (
+    50: var(--dark-primary-text),
+    100: var(--dark-primary-text),
+    200: var(--dark-primary-text),
+    300: var(--light-primary-text),
+    400: var(--light-primary-text),
+    500: var(--light-primary-text),
+    600: var(--light-primary-text),
+    700: var(--light-primary-text),
+    800: var(--light-primary-text),
+    900: var(--light-primary-text),
+    A100: var(--dark-primary-text),
+    A200: var(--light-primary-text),
+    A400: var(--light-primary-text),
+    A700: var(--light-primary-text),
+  ),
+);
+
+$light-accent-palette: (
+  50: var(--accent-50),
+  100: var(--accent-100),
+  200: var(--accent-200),
+  300: var(--accent-300),
+  400: var(--accent-400),
+  500: var(--accent-500),
+  600: var(--accent-600),
+  700: var(--accent-700),
+  800: var(--accent-800),
+  900: var(--accent-900),
+  A100: var(--accent-a100),
+  A200: var(--accent-a200),
+  A400: var(--accent-a300),
+  A700: var(--accent-a700),
+  contrast: (
+    50: var(--dark-primary-text),
+    100: var(--dark-primary-text),
+    200: var(--dark-primary-text),
+    300: var(--light-primary-text),
+    400: var(--light-primary-text),
+    500: var(--light-primary-text),
+    600: var(--light-primary-text),
+    700: var(--light-primary-text),
+    800: var(--light-primary-text),
+    900: var(--light-primary-text),
+    A100: var(--dark-primary-text),
+    A200: var(--light-primary-text),
+    A400: var(--light-primary-text),
+    A700: var(--light-primary-text),
+  ),
+);
+
+$dark-primary-palette: (
+  50: #f6faf5,
+  100: #e9f3e5,
+  200: #dbebd4,
+  300: #cce3c2,
+  400: #c1ddb5,
+  500: #b6d7a8,
+  600: #afd3a0,
+  700: #a6cd97,
+  800: #9ec78d,
+  900: #8ebe7d,
+  A100: #ffffff,
+  A200: #ffffff,
+  A400: #e7ffde,
+  A700: #d4ffc4,
+  contrast: (
+    50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #000000,
+    400: #000000,
+    500: #000000,
+    600: #000000,
+    700: #000000,
+    800: #000000,
+    900: #000000,
+    A100: #000000,
+    A200: #000000,
+    A400: #000000,
+    A700: #000000,
+  ),
+);
+
+$dark-accent-palette: (
+  50: #f1eff8,
+  100: #ddd8ed,
+  200: #c7bee1,
+  300: #b0a3d5,
+  400: #9f90cc,
+  500: #8e7cc3,
+  600: #8674bd,
+  700: #7b69b5,
+  800: #715fae,
+  900: #5f4ca1,
+  A100: #fefeff,
+  A200: #d6cbff,
+  A400: #ae98ff,
+  A700: #9a7fff,
+  contrast: (
+    50: #000000,
+    100: #000000,
+    200: #000000,
+    300: #000000,
+    400: #000000,
+    500: #000000,
+    600: #000000,
+    700: #ffffff,
+    800: #ffffff,
+    900: #ffffff,
+    A100: #000000,
+    A200: #000000,
+    A400: #000000,
+    A700: #000000,
+  ),
+);

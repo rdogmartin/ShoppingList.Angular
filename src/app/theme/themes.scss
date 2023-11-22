@@ -1,0 +1,62 @@
+@forward "./variables";
+
+@use "@angular/material" as mat;
+@use "./variables" as variables;
+
+$app-typography: mat.define-typography-config(
+  $headline-1: mat.define-typography-level(1.4375rem, 2rem, 400) /*23px, 32px, maps to .mat-headline-1 */,
+  $headline-2: mat.define-typography-level(1.4375rem, 2rem, 400) /*23px, 32px, maps to .mat-headline-2 */,
+  $headline-3: mat.define-typography-level(1.4375rem, 2rem, 400) /*23px, 32px, maps to .mat-headline-3 */,
+  $headline-4: mat.define-typography-level(1.4375rem, 2rem, 400) /*23px, 32px, maps to .mat-headline-4 */,
+  $headline-5: mat.define-typography-level(1.4375rem, 2rem, 400) /*23px,32px, maps to h1, .mat-h1 & .mat-headline-5*/,
+  $headline-6: mat.define-typography-level(1.25rem, 2rem, 400) /*20px, 32px, maps to h2, .mat-h2 & .mat-headline-6 */,
+  $subtitle-1: mat.define-typography-level(0.9375rem, 1.75rem, 400) /*15px,28px, maps to h3, .mat-h3 & .mat-subtitle-1*/,
+  $subtitle-2: mat.define-typography-level(0.75rem, 1.75rem, 400) /*12px,28px, .mat-body-strong & .mat-subtitle-2 */,
+  $body-1: mat.define-typography-level(1rem, 1.5rem, 400) /* 16px, 24px, maps to h4, .mat-h4 & .mat-body-1 */,
+  $body-2: mat.define-typography-level(1rem, 1.5rem, 400) /* 16px, 24px, maps to p */,
+  $caption: mat.define-typography-level(0.875rem, 2.25rem, 400) /* 14px, 36px, maps to .mat-small or .mat-caption */,
+  $button: mat.define-typography-level(0.875rem, 2.25rem, 500, 1.5rem, 0.078125rem) /* 14px, 36px */,
+);
+
+@include mat.typography-hierarchy($app-typography);
+@include mat.core();
+@include mat.strong-focus-indicators(); // Improved WCAG accessibility
+
+$light-primary: mat.define-palette(variables.$light-primary-palette);
+$light-accent: mat.define-palette(variables.$light-accent-palette);
+$light-warn: mat.define-palette(mat.$red-palette);
+$light-theme: mat.define-light-theme(
+  (
+    color: (
+      primary: $light-primary,
+      accent: $light-accent,
+      warn: $light-warn,
+    ),
+    typography: $app-typography,
+    density: 0,
+  )
+);
+
+$dark-primary: mat.define-palette(variables.$dark-primary-palette);
+$dark-accent: mat.define-palette(variables.$dark-accent-palette);
+$dark-warn: mat.define-palette(mat.$red-palette);
+$dark-theme: mat.define-dark-theme(
+  (
+    color: (
+      primary: $dark-primary,
+      accent: $dark-accent,
+      warn: $dark-warn,
+    ),
+    typography: $app-typography,
+    density: 0,
+  )
+);
+
+@include mat.all-component-themes($dark-theme);
+
+// Include the light color styles inside of a block with a CSS class. You can make this
+// CSS class whatever you want. In this example, any component inside of an element with
+// `.light-theme` will be affected by this alternate light theme instead of the default dark theme.
+.light-theme {
+  @include mat.all-component-themes($light-theme);
+}
