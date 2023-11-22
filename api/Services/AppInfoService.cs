@@ -3,6 +3,9 @@ using Api.Dto;
 
 namespace Api.Services;
 
+/// <summary>
+/// Contains functionality for retrieving application information.
+/// </summary>
 public interface IAppInfoService
 {
     /// <summary>
@@ -12,9 +15,6 @@ public interface IAppInfoService
     AppInfo GetApiInfo();
 }
 
-/// <summary>
-/// Contains functionality for retrieving application information.
-/// </summary>
 public class AppInfoService : IAppInfoService
 {
     public AppInfo GetApiInfo()

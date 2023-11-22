@@ -11,5 +11,6 @@ public class Startup : FunctionsStartup
     public override void Configure(IFunctionsHostBuilder builder)
     {
         builder.Services.AddScoped<IAppInfoService, AppInfoService>();
+        builder.Services.AddScoped<IListItemService, ListItemService>();
     }
 }
