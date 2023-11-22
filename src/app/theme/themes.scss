@@ -20,7 +20,7 @@ $app-typography: mat.define-typography-config(
 
 @include mat.typography-hierarchy($app-typography);
 @include mat.core();
-@include mat.strong-focus-indicators(); // Improved WCAG accessibility
+// @include mat.strong-focus-indicators(); // Improved WCAG accessibility
 
 $light-primary: mat.define-palette(variables.$light-primary-palette);
 $light-accent: mat.define-palette(variables.$light-accent-palette);
@@ -52,11 +52,10 @@ $dark-theme: mat.define-dark-theme(
   )
 );
 
-@include mat.all-component-themes($dark-theme);
-
-// Include the light color styles inside of a block with a CSS class. You can make this
-// CSS class whatever you want. In this example, any component inside of an element with
-// `.light-theme` will be affected by this alternate light theme instead of the default dark theme.
-.light-theme {
+@media (prefers-color-scheme: light) {
   @include mat.all-component-themes($light-theme);
+}
+
+@media (prefers-color-scheme: dark) {
+  @include mat.all-component-themes($dark-theme);
 }
