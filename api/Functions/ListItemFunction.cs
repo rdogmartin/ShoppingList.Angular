@@ -30,7 +30,7 @@ public class ListItemFunction
         var authResult = this._authService.Authorize(req);
         if (!authResult.IsAuthenticated)
         {
-            log.LogWarning("User not authentication. Aborting invocation of Api.Functions.GetListItems");
+            log.LogWarning("User not authenticated. Aborting invocation of Api.Functions.GetListItems");
             return Task.FromResult<IActionResult>(new UnauthorizedResult());
         }
 
