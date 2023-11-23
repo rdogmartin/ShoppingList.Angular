@@ -34,7 +34,7 @@ public class ListItemFunction
             return Task.FromResult<IActionResult>(new UnauthorizedResult());
         }
 
-        var listItems = _listItemService.GetListItems();
+        var listItems = _listItemService.GetListItems(authResult.User.Identity?.Name ?? "Unknown");
 
         return Task.FromResult<IActionResult>(new OkObjectResult(listItems));
     }
