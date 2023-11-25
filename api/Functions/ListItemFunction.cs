@@ -22,7 +22,7 @@ public class ListItemFunction
 
     [FunctionName("GetListItems")]
     public Task<IActionResult> Run(
-        [HttpTrigger(AuthorizationLevel.User, "get", Route = null)] HttpRequest req,
+        [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
         ILogger log)
     {
         log.LogInformation("GetListItems endpoint triggered.");
