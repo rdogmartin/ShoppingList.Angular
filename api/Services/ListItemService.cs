@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Api.Dto;
 using Microsoft.Azure.Cosmos;
 
@@ -15,33 +16,55 @@ public interface IListItemService
     /// </summary>
     /// <param name="userId"></param>
     /// <returns>A list of items.</returns>
-    UserListItems GetListItems(string userId);
+    Task<UserListItems> GetListItems(string userId);
 }
 
 public class ListItemService : IListItemService
 {
     private readonly CosmosClient _cosmosClient;
+    private Container _container;
 
     public ListItemService(CosmosClient cosmosClient)
     {
         _cosmosClient = cosmosClient;
     }
 
-    public UserListItems GetListItems(string userId)
+    public Container Container
     {
-        var container = _cosmosClient.GetContainer("ToDoList", "Items");
+        get
+        {
+            if (_container == null)
+            {
+                _container = _cosmosClient.GetContainer("ToDoList", "Items");
+            }
+            return _container;
+        }
+    }
+
+    public async Task<UserListItems> GetListItems(string userId)
+    {
         var sqlQueryText = $"SELECT * FROM c WHERE c.id = '{userId}'";
         var queryDefinition = new QueryDefinition(sqlQueryText);
-        var queryResultSetIterator = container.GetItemQueryIterator<UserListItems>(queryDefinition);
+        var queryResultSetIterator = Container.GetItemQueryIterator<UserListItems>(queryDefinition);
 
         while (queryResultSetIterator.HasMoreResults)
         {
             FeedResponse<UserListItems> response = queryResultSetIterator.ReadNextAsync().Result;
-            UserListItems dbItem = response.First();
-            return dbItem;
+            return response.FirstOrDefault() ?? await InsertNewUserAsync(userId);
         }
 
         throw new Exception("No items found.");
+    }
+
+    private async Task<UserListItems> InsertNewUserAsync(string userId)
+    {
+        var userListItems = new UserListItems(userId, Array.Empty<ListItem>());
+
+        ItemResponse<UserListItems> response = await Container.UpsertItemAsync(
+            item: userListItems
+        );
+
+        return response.Resource;
     }
 
     //public UserListItems GetListItems(string userId)

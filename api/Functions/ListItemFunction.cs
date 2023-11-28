@@ -21,7 +21,7 @@ public class ListItemFunction
     }
 
     [FunctionName("GetListItems")]
-    public Task<IActionResult> Run(
+    public async Task<IActionResult> Run(
         [HttpTrigger(AuthorizationLevel.Anonymous, "get", Route = null)] HttpRequest req,
         ILogger log)
     {
@@ -31,12 +31,12 @@ public class ListItemFunction
         if (!authResult.IsAuthenticated)
         {
             log.LogWarning("User not authenticated. Aborting invocation of Api.Functions.GetListItems");
-            return Task.FromResult<IActionResult>(new UnauthorizedResult());
+            return await Task.FromResult<IActionResult>(new UnauthorizedResult());
         }
 
-        var listItems = _listItemService.GetListItems(authResult.User.Identity?.Name ?? "Unknown");
+        var listItems = await _listItemService.GetListItems(authResult.User.Identity?.Name ?? "Unknown");
         //var listItems = _listItemService.GetListItems("Unknown");
 
-        return Task.FromResult<IActionResult>(new OkObjectResult(listItems));
+        return await Task.FromResult<IActionResult>(new OkObjectResult(listItems));
     }
 }
