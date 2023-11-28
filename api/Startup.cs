@@ -17,6 +17,7 @@ public class Startup : FunctionsStartup
     private static readonly IConfigurationRoot Configuration = new ConfigurationBuilder()
         .SetBasePath(Environment.CurrentDirectory)
         .AddJsonFile("appSettings.json", optional: false, reloadOnChange: true)
+        .AddUserSecrets<Startup>()
         .AddEnvironmentVariables()
         .Build();
 
@@ -38,9 +39,9 @@ public class Startup : FunctionsStartup
         }
 
         string authKey = Configuration["AuthorizationKey"];
-        if (string.IsNullOrEmpty(authKey))
+        if (string.IsNullOrEmpty(authKey) || string.Equals(authKey, "Put actual key in secrets.json"))
         {
-            throw new ConfigurationErrorsException("Please specify a valid AuthorizationKey in the appSettings.json file or your Azure Functions Settings.");
+            throw new ConfigurationErrorsException("Please specify a valid AuthorizationKey in secrets.json, the appSettings.json file or your Azure Functions Settings.");
         }
 
         var configurationBuilder = new CosmosClientBuilder(endpoint, authKey);
