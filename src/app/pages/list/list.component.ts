@@ -19,7 +19,7 @@ export class ListComponent {
   });
 
   userListItems = toSignal(this.listItemService.getListItems(), {
-    initialValue: { id: '', listItems: [] },
+    initialValue: [],
     requireSync: false,
   });
 
