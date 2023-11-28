@@ -18,7 +18,10 @@ export class ListComponent {
     requireSync: false,
   });
 
-  listItems = toSignal(this.listItemService.getListItems(), { initialValue: [], requireSync: false });
+  userListItems = toSignal(this.listItemService.getListItems(), {
+    initialValue: { id: '', listItems: [] },
+    requireSync: false,
+  });
 
   constructor(
     private authService: AuthService,

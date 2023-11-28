@@ -35,6 +35,7 @@ public class ListItemFunction
         }
 
         var listItems = _listItemService.GetListItems(authResult.User.Identity?.Name ?? "Unknown");
+        //var listItems = _listItemService.GetListItems("Unknown");
 
         return Task.FromResult<IActionResult>(new OkObjectResult(listItems));
     }
