@@ -1,6 +1,3 @@
 {
-  "recommendations": [
-    "ms-azuretools.vscode-azurefunctions",
-    "ms-dotnettools.csharp"
-  ]
+  "recommendations": ["adrianwilczynski.user-secrets", "ms-azuretools.vscode-azurefunctions", "ms-dotnettools.csharp"]
 }
