@@ -14,6 +14,11 @@ export interface AppInfo {
   versionNumber: string;
 }
 
+export interface UserListItems {
+  id: string;
+  listItems: ListItem[];
+}
+
 export interface ListItem {
   id: number;
   description: string;
