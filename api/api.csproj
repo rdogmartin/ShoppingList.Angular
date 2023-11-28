@@ -5,6 +5,7 @@
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <AssemblyVersion>0.0.1</AssemblyVersion>
     <UserSecretsId>106e2527-4a88-4a67-9a8a-64cbd36afe34</UserSecretsId>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
