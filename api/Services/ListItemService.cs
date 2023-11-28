@@ -22,30 +22,19 @@ public interface IListItemService
 public class ListItemService : IListItemService
 {
     private readonly CosmosClient _cosmosClient;
-    private Container _container;
+    private readonly Container _container;
 
     public ListItemService(CosmosClient cosmosClient)
     {
         _cosmosClient = cosmosClient;
-    }
-
-    public Container Container
-    {
-        get
-        {
-            if (_container == null)
-            {
-                _container = _cosmosClient.GetContainer("ToDoList", "Items");
-            }
-            return _container;
-        }
+        _container = _cosmosClient.GetContainer("ToDoList", "Items");
     }
 
     public async Task<UserListItems> GetListItems(string userId)
     {
         var sqlQueryText = $"SELECT * FROM c WHERE c.id = '{userId}'";
         var queryDefinition = new QueryDefinition(sqlQueryText);
-        var queryResultSetIterator = Container.GetItemQueryIterator<UserListItems>(queryDefinition);
+        var queryResultSetIterator = _container.GetItemQueryIterator<UserListItems>(queryDefinition);
 
         while (queryResultSetIterator.HasMoreResults)
         {
@@ -60,7 +49,7 @@ public class ListItemService : IListItemService
     {
         var userListItems = new UserListItems(userId, Array.Empty<ListItem>());
 
-        ItemResponse<UserListItems> response = await Container.UpsertItemAsync(
+        ItemResponse<UserListItems> response = await _container.UpsertItemAsync(
             item: userListItems
         );
 
