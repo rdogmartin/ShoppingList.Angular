@@ -1,5 +1,9 @@
 <p>Hello, {{currentUser().userDetails}}!</p>
 
+@if (userListItems()) {
 @for (listItem of userListItems(); track listItem.id) {
 <p><mat-checkbox>{{ listItem.description }}</mat-checkbox></p>
+}
+} @else {
+<mat-spinner diameter="20"></mat-spinner>
 }
