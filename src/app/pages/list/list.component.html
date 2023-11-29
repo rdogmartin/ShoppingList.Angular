@@ -2,7 +2,7 @@
 
 <form [formGroup]="listForm" (ngSubmit)="onSubmit()">
   <mat-form-field appearance="outline">
-    <input matInput formControlName="newItem" placeholder="Add an item" value="" [cdkTrapFocusAutoCapture]="true" [cdkTrapFocus]="true">
+    <input matInput formControlName="newItem" placeholder="Add an item" value="" [cdkTrapFocusAutoCapture]="true" [cdkTrapFocus]="true" enterkeyhint="done">
   </mat-form-field>
 </form>
 
