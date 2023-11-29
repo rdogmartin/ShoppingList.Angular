@@ -66,13 +66,9 @@ public class ListItemFunctions
             return await Task.FromResult<IActionResult>(new BadRequestObjectResult("Invalid request body. Must be a valid ListItem."));
         }
 
-        var listItems = await _listItemService.AddListItem(authResult.User.Identity?.Name ?? "Unknown", itemToAdd);
+        var userListItems = await _listItemService.AddListItem(authResult.User.Identity?.Name ?? "Unknown", itemToAdd);
 
-        var response = new CreatedResult($"{req.Scheme}://{req.Host}{req.Path}", itemToAdd);
-        //var listItems = _listItemService.GetListItems("Unknown");
-
-        return response;
-        //return await Task.FromResult<IActionResult>(new CreatedResult());
+        return new CreatedResult($"{req.Scheme}://{req.Host}/api/GetListItems", userListItems);
     }
 
     [FunctionName("UpdateListItem")]
@@ -90,6 +86,8 @@ public class ListItemFunctions
         }
 
         string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+
+        // TODO: Validate that the request body is a valid ListItem.
         var itemToUpdate = JsonConvert.DeserializeObject<ListItem>(requestBody);
 
         if (itemToUpdate == null)
@@ -97,12 +95,8 @@ public class ListItemFunctions
             return await Task.FromResult<IActionResult>(new BadRequestObjectResult("Invalid request body. Must be a valid ListItem."));
         }
 
-        var listItems = await _listItemService.UpdateListItem(authResult.User.Identity?.Name ?? "Unknown", itemToUpdate);
+        var userListItems = await _listItemService.UpdateListItem(authResult.User.Identity?.Name ?? "Unknown", itemToUpdate);
 
-        var response = new CreatedResult($"{req.Scheme}://{req.Host}{req.Path}", itemToUpdate);
-        //var listItems = _listItemService.GetListItems("Unknown");
-
-        return response;
-        //return await Task.FromResult<IActionResult>(new CreatedResult());
+        return await Task.FromResult<ActionResult>(new OkObjectResult(userListItems));
     }
 }

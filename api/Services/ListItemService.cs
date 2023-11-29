@@ -12,16 +12,30 @@ namespace Api.Services;
 public interface IListItemService
 {
     /// <summary>
-    /// Retrieves all current list items
+    /// Retrieves all current list items for the specified user. If the user does not exist, a new user will be created with an empty list.
     /// </summary>
     /// <param name="userId"></param>
-    /// <returns>A list of items.</returns>
+    /// <returns>A list of items belonging to the user.</returns>
     Task<UserListItems> GetListItems(string userId);
 
+    /// <summary>
+    /// Insert the specified item at the beginning of the list and returns the full list.
+    /// </summary>
+    /// <param name="userId">A unique identifier for the user. Ex: myname@outlook.com</param>
+    /// <param name="itemToAdd">The item to add</param>
+    /// <returns>The full list of items, including the newly added one.</returns>
     Task<UserListItems> AddListItem(string userId, ListItem itemToAdd);
+
+    /// <summary>
+    /// Updates the specified item in the list, adding it if it doesn't already exist, and returns the full list.
+    /// </summary>
+    /// <param name="userId">A unique identifier for the user. Ex: myname@outlook.com</param>
+    /// <param name="itemToUpdate">The item to update</param>
+    /// <returns>The full list of items, including the newly added one.</returns>
     Task<UserListItems> UpdateListItem(string userId, ListItem itemToUpdate);
 }
 
+/// <inheritdoc />
 public class ListItemService : IListItemService
 {
     private readonly CosmosClient _cosmosClient;
@@ -42,7 +56,7 @@ public class ListItemService : IListItemService
         while (queryResultSetIterator.HasMoreResults)
         {
             FeedResponse<UserListItems> response = queryResultSetIterator.ReadNextAsync().Result;
-            return response.FirstOrDefault() ?? await InsertNewUserAsync(userId);
+            return response.FirstOrDefault() ?? await InsertNewUser(userId);
         }
 
         throw new Exception("No items found.");
@@ -67,7 +81,28 @@ public class ListItemService : IListItemService
 
         var dbItemToUpdate = userListItems.ListItems.FirstOrDefault(i => i.Description == itemToUpdate.Description);
 
-        var updatedListItems = userListItems.ListItems.Select(listItem => listItem == dbItemToUpdate ? itemToUpdate : listItem).ToArray();
+        if (dbItemToUpdate == null)
+        {
+            return await this.AddListItem(userId, itemToUpdate);
+        }
+
+        ListItem[] updatedListItems;
+        if (dbItemToUpdate.IsComplete && !itemToUpdate.IsComplete)
+        {
+            // Item is being unchecked. Move it to the top of the list.
+            updatedListItems = userListItems.ListItems.Where(listItem => listItem != dbItemToUpdate).Prepend(itemToUpdate).ToArray();
+        }
+        else if (!dbItemToUpdate.IsComplete && itemToUpdate.IsComplete)
+        {
+            // Item is being checked. Move it to the beginning of the complete items.
+            updatedListItems = userListItems.ListItems.Where(li => !li.IsComplete && li != dbItemToUpdate).Append(itemToUpdate).Concat(userListItems.ListItems.Where(li => li.IsComplete)).ToArray();
+        }
+        else
+        {
+            // Item is being updated, but not checked/unchecked. Keep it in the same place in the list.
+            updatedListItems = userListItems.ListItems.Select(listItem => listItem == dbItemToUpdate ? itemToUpdate : listItem).OrderBy(listItem => listItem.IsComplete).ToArray();
+        }
+
         userListItems = userListItems with { ListItems = updatedListItems };
 
         ItemResponse<UserListItems> response = await _container.UpsertItemAsync(
@@ -77,7 +112,7 @@ public class ListItemService : IListItemService
         return response.Resource;
     }
 
-    private async Task<UserListItems> InsertNewUserAsync(string userId)
+    private async Task<UserListItems> InsertNewUser(string userId)
     {
         var userListItems = new UserListItems(userId, Array.Empty<ListItem>());
 
@@ -87,31 +122,4 @@ public class ListItemService : IListItemService
 
         return response.Resource;
     }
-
-    //public UserListItems GetListItems(string userId)
-    //{
-    //    List<ListItem> items = new()
-    //    {
-    //        new ListItem(1, "Bread", false),
-    //        new ListItem(2, "Carrots", false),
-    //        new ListItem(3, "Shampoo", false),
-    //        new ListItem(4, $"Shoes for {userId}", false),
-    //    };
-
-    //    return items;
-    //}
-
-    //private void InsertListItemIntoCosmos(string id)
-    //{
-    //    var userListItems = new UserListItems(id,
-    //        new ListItem[]
-    //        {
-    //            new(1, "Carrots", false),
-    //            new(3, "Shampoo", false),
-    //            new(4, $"Shoes for Unknown", false),
-    //        });
-
-    //    var container = _cosmosClient.GetContainer("ToDoList", "Items");
-    //    var response = container.CreateItemAsync(userListItems).Result;
-    //}
 }

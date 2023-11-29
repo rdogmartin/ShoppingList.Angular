@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -55,11 +55,7 @@ export class ListComponent implements OnDestroy {
   private addItem(item: ListItem) {
     const subscription = this.listItemService
       .addItem(item)
-      .pipe(
-        tap(() => {
-          this.userListItems()!.unshift(item);
-        }),
-      )
+      .pipe(tap((userListItems) => (this.userListItems = signal(userListItems.listItems))))
       .subscribe();
 
     this.subscriptions.add(subscription);
@@ -68,15 +64,7 @@ export class ListComponent implements OnDestroy {
   private updateItem(itemToUpdate: ListItem) {
     const subscription = this.listItemService
       .updateItem(itemToUpdate)
-      .pipe(
-        tap(() => {
-          const index = this.userListItems()!.findIndex((item) => item.description === itemToUpdate.description);
-          if (index !== -1) {
-            const item = this.userListItems()!.splice(index, 1)[0];
-            this.userListItems()!.push(item);
-          }
-        }),
-      )
+      .pipe(tap((userListItems) => (this.userListItems = signal(userListItems.listItems))))
       .subscribe();
 
     this.subscriptions.add(subscription);
