@@ -14,10 +14,10 @@ export class ListItemService {
   }
 
   public addItem(item: ListItem) {
-    return this.http.post('/api/AddListItem', item);
+    return this.http.post<UserListItems>('/api/AddListItem', item);
   }
 
   public updateItem(item: ListItem) {
-    return this.http.put('/api/UpdateListItem', item);
+    return this.http.put<UserListItems>('/api/UpdateListItem', item);
   }
 }
