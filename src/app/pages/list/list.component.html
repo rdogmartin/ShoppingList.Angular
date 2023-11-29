@@ -1,8 +1,8 @@
 <p>Hello, {{currentUser().userDetails}}!</p>
 
-<form class="example-form">
+<form [formGroup]="listForm" (ngSubmit)="onSubmit()">
   <mat-form-field appearance="outline">
-    <input matInput (blur)="onAddItemBlur($event)" placeholder="Add an item" value="">
+    <input matInput formControlName="newItem" placeholder="Add an item" value="" [cdkTrapFocusAutoCapture]="true" [cdkTrapFocus]="true">
   </mat-form-field>
 </form>
 

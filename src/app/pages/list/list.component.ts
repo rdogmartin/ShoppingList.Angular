@@ -1,6 +1,8 @@
+import { A11yModule } from '@angular/cdk/a11y';
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, signal } from '@angular/core';
+import { Component, OnDestroy, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatCheckboxChange, MatCheckboxModule } from '@angular/material/checkbox';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -13,11 +15,19 @@ import { ListItemService } from '../../shared/services/listItem.service';
 @Component({
   selector: 'app-list',
   standalone: true,
-  imports: [CommonModule, MatCheckboxModule, MatFormFieldModule, MatInputModule, MatProgressSpinnerModule],
+  imports: [
+    A11yModule,
+    CommonModule,
+    MatCheckboxModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    ReactiveFormsModule,
+  ],
   templateUrl: './list.component.html',
   styleUrl: './list.component.scss',
 })
-export class ListComponent implements OnDestroy {
+export class ListComponent implements OnInit, OnDestroy {
   public currentUser = toSignal(this.authService.getCurrentUser(), {
     initialValue: { userId: '', userRoles: [], identityProvider: '', userDetails: '', claims: [] },
     requireSync: false,
@@ -28,21 +38,29 @@ export class ListComponent implements OnDestroy {
     requireSync: false,
   });
 
+  public listForm!: FormGroup<{
+    newItem: FormControl<string | null>;
+  }>;
+
   private subscriptions = new Subscription();
 
   constructor(
     private authService: AuthService,
+    private formBuilder: FormBuilder,
     private listItemService: ListItemService,
   ) {}
+
+  public ngOnInit(): void {
+    this.initializeForm();
+  }
 
   public ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
 
-  public onAddItemBlur(e: FocusEvent) {
-    const description = (e.target as HTMLInputElement).value;
-
-    if (description.length > 0) {
+  public onSubmit() {
+    const description = this.listForm.value.newItem;
+    if (description && description.length > 0) {
       this.addItem({ description, isComplete: false });
     }
   }
@@ -52,10 +70,21 @@ export class ListComponent implements OnDestroy {
     this.updateItem(updatedItem);
   }
 
+  private initializeForm() {
+    this.listForm = this.formBuilder.group({
+      newItem: this.formBuilder.control<string>(''),
+    });
+  }
+
   private addItem(item: ListItem) {
     const subscription = this.listItemService
       .addItem(item)
-      .pipe(tap((userListItems) => (this.userListItems = signal(userListItems.listItems))))
+      .pipe(
+        tap((userListItems) => {
+          this.userListItems = signal(userListItems.listItems);
+          this.listForm.controls.newItem.reset();
+        }),
+      )
       .subscribe();
 
     this.subscriptions.add(subscription);
