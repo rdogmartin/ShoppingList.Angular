@@ -1,8 +1,18 @@
 <p>Hello, {{currentUser().userDetails}}!</p>
 
+<form class="example-form">
+  <mat-form-field appearance="outline">
+    <input matInput (blur)="onAddItemBlur($event)" placeholder="Add an item" value="">
+  </mat-form-field>
+</form>
+
 @if (userListItems()) {
-@for (listItem of userListItems(); track listItem.id) {
-<p><mat-checkbox>{{ listItem.description }}</mat-checkbox></p>
+@for (listItem of userListItems(); track listItem.description) {
+<p>
+  <mat-checkbox [checked]="listItem.isComplete" (change)="onCheckboxChange($event, listItem)" [ngClass]="{ 'line-through': listItem.isComplete }">
+    {{ listItem.description }}
+  </mat-checkbox>
+</p>
 }
 } @else {
 <mat-spinner diameter="20"></mat-spinner>
