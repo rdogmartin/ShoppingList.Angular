@@ -20,7 +20,6 @@ export interface UserListItems {
 }
 
 export interface ListItem {
-  id: number;
   description: string;
   isComplete: boolean;
 }

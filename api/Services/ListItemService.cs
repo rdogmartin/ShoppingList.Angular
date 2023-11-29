@@ -17,6 +17,9 @@ public interface IListItemService
     /// <param name="userId"></param>
     /// <returns>A list of items.</returns>
     Task<UserListItems> GetListItems(string userId);
+
+    Task<UserListItems> AddListItem(string userId, ListItem itemToAdd);
+    Task<UserListItems> UpdateListItem(string userId, ListItem itemToUpdate);
 }
 
 public class ListItemService : IListItemService
@@ -43,6 +46,35 @@ public class ListItemService : IListItemService
         }
 
         throw new Exception("No items found.");
+    }
+
+    public async Task<UserListItems> AddListItem(string userId, ListItem itemToAdd)
+    {
+        var userListItems = await GetListItems(userId);
+
+        userListItems = userListItems with { ListItems = userListItems.ListItems.Prepend(itemToAdd).ToArray() };
+
+        ItemResponse<UserListItems> response = await _container.UpsertItemAsync(
+            item: userListItems
+        );
+
+        return response.Resource;
+    }
+
+    public async Task<UserListItems> UpdateListItem(string userId, ListItem itemToUpdate)
+    {
+        var userListItems = await GetListItems(userId);
+
+        var dbItemToUpdate = userListItems.ListItems.FirstOrDefault(i => i.Description == itemToUpdate.Description);
+
+        var updatedListItems = userListItems.ListItems.Select(listItem => listItem == dbItemToUpdate ? itemToUpdate : listItem).ToArray();
+        userListItems = userListItems with { ListItems = updatedListItems };
+
+        ItemResponse<UserListItems> response = await _container.UpsertItemAsync(
+            item: userListItems
+        );
+
+        return response.Resource;
     }
 
     private async Task<UserListItems> InsertNewUserAsync(string userId)
