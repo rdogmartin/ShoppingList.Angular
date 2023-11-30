@@ -1,9 +1,12 @@
 <p>Hello, {{currentUser().userDetails}}!</p>
 
 <form [formGroup]="listForm" (ngSubmit)="onSubmit()">
-  <mat-form-field appearance="outline">
-    <input matInput formControlName="newItem" placeholder="Add an item" value="" [cdkTrapFocusAutoCapture]="true" [cdkTrapFocus]="true" enterkeyhint="done">
-  </mat-form-field>
+  <div class="flex items-start">
+    <mat-icon class="ml-2 mt-4 mr-2">add</mat-icon>
+    <mat-form-field appearance="outline" class="w-full">
+      <input matInput formControlName="newItem" placeholder="Add an item" value="" [cdkTrapFocusAutoCapture]="true" [cdkTrapFocus]="true" enterkeyhint="done">
+    </mat-form-field>
+  </div>
 </form>
 
 @if (userListItems()) {
@@ -15,5 +18,7 @@
 </p>
 }
 } @else {
-<mat-spinner diameter="20"></mat-spinner>
+<div class="flex justify-center items-center w-[20rem] h-[10rem]">
+  <mat-spinner diameter="20"></mat-spinner>
+</div>
 }
