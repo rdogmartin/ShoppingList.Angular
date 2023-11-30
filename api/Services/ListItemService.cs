@@ -19,7 +19,8 @@ public interface IListItemService
     Task<UserListItems> GetListItems(string userId);
 
     /// <summary>
-    /// Insert the specified item at the beginning of the list and returns the full list.
+    /// Insert the specified item at the beginning of the list and returns the full list. If an item with the same description exists, then
+    /// we'll just move that one to the top of the list and mark it as NOT complete.
     /// </summary>
     /// <param name="userId">A unique identifier for the user. Ex: myname@outlook.com</param>
     /// <param name="itemToAdd">The item to add</param>
@@ -28,6 +29,8 @@ public interface IListItemService
 
     /// <summary>
     /// Updates the specified item in the list, adding it if it doesn't already exist, and returns the full list.
+    /// If an item is being marked as complete, it is moved to the top of the complete items.
+    /// If an item is being marked as NOT complete, it is moved to the top of the list.
     /// </summary>
     /// <param name="userId">A unique identifier for the user. Ex: myname@outlook.com</param>
     /// <param name="itemToUpdate">The item to update</param>
@@ -66,7 +69,14 @@ public class ListItemService : IListItemService
     {
         var userListItems = await GetListItems(userId);
 
-        userListItems = userListItems with { ListItems = userListItems.ListItems.Prepend(itemToAdd).ToArray() };
+        // If the item already exists, use that instead of creating a duplicate.
+        itemToAdd = userListItems.ListItems.FirstOrDefault(i => i.Description.Equals(itemToAdd.Description, StringComparison.OrdinalIgnoreCase)) ?? itemToAdd;
+
+        // Mark as NOT complete (mostly relevant when user is adding an item that has been previously completed).
+        itemToAdd = itemToAdd with { IsComplete = false };
+
+        // Add the item to the beginning of the list, excluding any that have the same name that already exist.
+        userListItems = userListItems with { ListItems = userListItems.ListItems.Where(li => !li.Description.Equals(itemToAdd.Description, StringComparison.OrdinalIgnoreCase)).Prepend(itemToAdd).ToArray() };
 
         ItemResponse<UserListItems> response = await _container.UpsertItemAsync(
             item: userListItems
