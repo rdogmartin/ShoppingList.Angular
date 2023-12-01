@@ -1,11 +1,7 @@
-<p>Hello, {{currentUser().userDetails}}!</p>
-
 <form [formGroup]="listForm" (ngSubmit)="onSubmit()">
   <div class="flex items-start">
-    <mat-icon class="ml-2 mt-4 mr-2">add</mat-icon>
-    <mat-form-field appearance="outline" class="w-full">
-      <input matInput formControlName="newItem" placeholder="Add an item" value="" [cdkTrapFocusAutoCapture]="true" [cdkTrapFocus]="true" enterkeyhint="done">
-    </mat-form-field>
+    <mat-icon class="ml-2 mt-3 mr-2">add</mat-icon>
+    <input type="text" class="w-full h-12 p-3 bg-transparent border-none" formControlName="newItem" placeholder="Add an item" value="" [cdkTrapFocusAutoCapture]="true" [cdkTrapFocus]="true" enterkeyhint="done">
   </div>
 </form>
 
