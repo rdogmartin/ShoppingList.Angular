@@ -13,8 +13,8 @@ import { AuthService } from '../../services/auth.service';
   styleUrl: './footer.component.scss',
 })
 export class FooterComponent {
-  model$ = combineLatest([this.appInfoService.getAppInfo(), this.authService.isLoggedIn$]).pipe(
-    map(([appInfo, isLoggedIn]) => ({ appInfo, isLoggedIn })),
+  model$ = combineLatest([this.appInfoService.getAppInfo(), this.authService.getCurrentUser()]).pipe(
+    map(([appInfo, user]) => ({ appInfo, user })),
   );
 
   constructor(

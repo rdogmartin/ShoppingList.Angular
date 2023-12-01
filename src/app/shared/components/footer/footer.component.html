@@ -1,19 +1,19 @@
 @if (model$ | async; as model) {
 <footer class="p-1">
   <p class="p-3 flex items-center font-semibold">
-    @if (!model.isLoggedIn) {
+    @if (!model.user.userDetails) {
     <a href="/.auth/login/aad" class="border d-block m-2 p-3 border-[#8c8c8c] bg-white text-black hover:bg-slate-200">
       <img src="assets/images/microsoft.svg" alt="Microsoft Logo" class="w-4 h-4 inline-block mr-2" style="width:21px;height:21px;" />
       Sign in with Microsoft
     </a>
     }
   </p>
-  <p class="pt-3">
-    @if (model.isLoggedIn) {
-    <a href="/.auth/logout" class="my-2 px-2 hover:bg-slate-100 dark:hover:bg-slate-700">Log out</a>
-    <span class="pr-2">|</span>
-    }
+  <p class="pt-3 pl-1">
     Version {{model.appInfo.versionNumber}}
+    @if (model.user.userDetails) {
+    <span class="px-2">|</span>
+    Logged in as {{model.user.userDetails}}<a href="/.auth/logout" class="m-2 p-1 underline hover:bg-slate-100 dark:hover:bg-slate-700">Log out</a>
+    }
   </p>
 </footer>
 }
