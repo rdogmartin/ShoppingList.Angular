@@ -30,11 +30,6 @@ import { ListItemService } from '../../shared/services/listItem.service';
   styleUrl: './list.component.scss',
 })
 export class ListComponent implements OnInit, OnDestroy {
-  public currentUser = toSignal(this.authService.getCurrentUser(), {
-    initialValue: { userId: '', userRoles: [], identityProvider: '', userDetails: '', claims: [] },
-    requireSync: false,
-  });
-
   public userListItems = toSignal(this.listItemService.getListItems(), {
     initialValue: null,
     requireSync: false,
