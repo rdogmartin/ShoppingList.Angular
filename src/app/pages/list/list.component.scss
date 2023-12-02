@@ -1,0 +1,4 @@
+/* Show save/delete buttons when input has focus */
+input[type="text"]:focus ~ button {
+  visibility: visible;
+}
