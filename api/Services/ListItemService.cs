@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Api.Dto;
 using Microsoft.Azure.Cosmos;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace Api.Services;
@@ -56,11 +58,41 @@ public class ListItemService : IListItemService
 {
     private readonly CosmosClient _cosmosClient;
     private readonly Container _container;
+    private readonly IConfiguration _configuration;
 
-    public ListItemService(CosmosClient cosmosClient)
+    public ListItemService(CosmosClient cosmosClient, IConfiguration configuration)
     {
         _cosmosClient = cosmosClient;
         _container = _cosmosClient.GetContainer("ToDoList", "Items");
+        _configuration = configuration;
+    }
+
+    public string BingSearchSubscriptionKey
+    {
+        get
+        {
+            var configValue = _configuration["BingSearch:SubscriptionKey"];
+
+            if (string.IsNullOrEmpty(configValue) || configValue.StartsWith("Put actual key in secrets.json"))
+            {
+                throw new ConfigurationErrorsException("Missing setting 'BingSearch:SubscriptionKey'. Please specify a valid subscription key in the appSettings.json file or your Azure Functions Settings.");
+            }
+            return configValue;
+        }
+    }
+
+    public string BingSearchEndpointUrl
+    {
+        get
+        {
+            var configValue = _configuration["BingSearch:EndpointUrl"];
+
+            if (string.IsNullOrEmpty(configValue) || configValue.StartsWith("Put actual key in secrets.json"))
+            {
+                throw new ConfigurationErrorsException("Missing setting 'BingSearch:EndpointUrl'. Please specify a valid subscription key in the appSettings.json file or your Azure Functions Settings.");
+            }
+            return configValue;
+        }
     }
 
     public async Task<UserListItems> GetListItems(string userId)
@@ -166,16 +198,14 @@ public class ListItemService : IListItemService
         return response.Resource;
     }
 
-    private static string GetThumbnailImageUrl(string itemDescription)
+    private string GetThumbnailImageUrl(string itemDescription)
     {
-        string subscriptionKey = "a8cd7c871ea14d9598da24147519ba58";
-        //var endpoint = "https://api.bing.microsoft.com/v7.0/search";
-        var endpoint = "https://api.bing.microsoft.com/v7.0/images/search";
-        var uriQuery = $"{endpoint}?q={Uri.EscapeDataString(itemDescription)}&count=1";
+        // More info: https://learn.microsoft.com/en-us/bing/search-apis/bing-image-search/reference/query-parameters
+        var uriQuery = $"{BingSearchEndpointUrl}?q={Uri.EscapeDataString(itemDescription)}&count=1";
 
         // Perform the Web request and get the response
         WebRequest request = HttpWebRequest.Create(uriQuery);
-        request.Headers["Ocp-Apim-Subscription-Key"] = subscriptionKey;
+        request.Headers["Ocp-Apim-Subscription-Key"] = BingSearchSubscriptionKey;
         HttpWebResponse response = (HttpWebResponse)request.GetResponseAsync().Result;
         string json = new StreamReader(response.GetResponseStream()).ReadToEnd();
 

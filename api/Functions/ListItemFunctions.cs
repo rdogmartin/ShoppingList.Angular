@@ -38,7 +38,6 @@ public class ListItemFunctions
         }
 
         var listItems = await _listItemService.GetListItems(authResult?.User?.Identity?.Name ?? "Unknown");
-        //var listItems = _listItemService.GetListItems("Unknown");
 
         return await Task.FromResult<ActionResult>(new OkObjectResult(listItems));
     }
