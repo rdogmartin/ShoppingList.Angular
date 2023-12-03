@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 using Api.Dto;
 using Microsoft.Azure.Cosmos;
+using Newtonsoft.Json;
 
 namespace Api.Services;
 
@@ -25,7 +29,7 @@ public interface IListItemService
     /// <param name="userId">A unique identifier for the user. Ex: myname@outlook.com</param>
     /// <param name="itemToAdd">The item to add</param>
     /// <returns>The full list of items as they exist in the data store immediately after the addition.</returns>
-    Task<UserListItems> AddListItem(string userId, ListItem itemToAdd);
+    Task<UserListItems> AddListItem(string userId, ListItemAdd itemToAdd);
 
     /// <summary>
     /// Updates the specified item in the list, adding it if it doesn't already exist, and returns the full list.
@@ -74,18 +78,23 @@ public class ListItemService : IListItemService
         throw new Exception("No items found.");
     }
 
-    public async Task<UserListItems> AddListItem(string userId, ListItem itemToAdd)
+    public async Task<UserListItems> AddListItem(string userId, ListItemAdd itemToAdd)
     {
         var userListItems = await GetListItems(userId);
 
         // If the item already exists, use that instead of creating a duplicate.
-        itemToAdd = userListItems.ListItems.FirstOrDefault(i => i.Description.Equals(itemToAdd.Description, StringComparison.OrdinalIgnoreCase)) ?? itemToAdd;
+        var listItem = userListItems.ListItems.FirstOrDefault(i => i.Description.Equals(itemToAdd.Description, StringComparison.OrdinalIgnoreCase));
+
+        if (listItem == null)
+        {
+            listItem = new ListItem(itemToAdd.Description, GetThumbnailImageUrl(itemToAdd.Description), false);
+        }
 
         // Mark as NOT complete (mostly relevant when user is adding an item that has been previously completed).
-        itemToAdd = itemToAdd with { IsComplete = false };
+        listItem = listItem with { IsComplete = false };
 
         // Add the item to the beginning of the list, excluding any that have the same name that already exist.
-        userListItems = userListItems with { ListItems = userListItems.ListItems.Where(li => !li.Description.Equals(itemToAdd.Description, StringComparison.OrdinalIgnoreCase)).Prepend(itemToAdd).ToArray() };
+        userListItems = userListItems with { ListItems = userListItems.ListItems.Where(li => !li.Description.Equals(itemToAdd.Description, StringComparison.OrdinalIgnoreCase)).Prepend(listItem).ToArray() };
 
         ItemResponse<UserListItems> response = await _container.UpsertItemAsync(
             item: userListItems
@@ -102,7 +111,7 @@ public class ListItemService : IListItemService
 
         if (dbItemToUpdate == null)
         {
-            return await this.AddListItem(userId, new ListItem(itemToUpdate.Description, itemToUpdate.IsComplete));
+            return await this.AddListItem(userId, new ListItemAdd(itemToUpdate.Description));
         }
 
         ListItem[] updatedListItems;
@@ -127,7 +136,7 @@ public class ListItemService : IListItemService
         {
             // Item is being updated, but not checked/unchecked. Keep it in the same place in the list and update the description.
             updatedListItems = userListItems.ListItems
-                .Select(listItem => listItem == dbItemToUpdate ? dbItemToUpdate with { Description = itemToUpdate.NewDescription } : listItem)
+                .Select(listItem => listItem == dbItemToUpdate ? dbItemToUpdate with { Description = itemToUpdate.NewDescription, ImageUrl = GetThumbnailImageUrl(itemToUpdate.NewDescription) } : listItem)
                 .OrderBy(listItem => listItem.IsComplete)
                 .ToArray();
         }
@@ -155,6 +164,43 @@ public class ListItemService : IListItemService
         );
 
         return response.Resource;
+    }
+
+    private static string GetThumbnailImageUrl(string itemDescription)
+    {
+        string subscriptionKey = "a8cd7c871ea14d9598da24147519ba58";
+        //var endpoint = "https://api.bing.microsoft.com/v7.0/search";
+        var endpoint = "https://api.bing.microsoft.com/v7.0/images/search";
+        var uriQuery = $"{endpoint}?q={Uri.EscapeDataString(itemDescription)}&count=1";
+
+        // Perform the Web request and get the response
+        WebRequest request = HttpWebRequest.Create(uriQuery);
+        request.Headers["Ocp-Apim-Subscription-Key"] = subscriptionKey;
+        HttpWebResponse response = (HttpWebResponse)request.GetResponseAsync().Result;
+        string json = new StreamReader(response.GetResponseStream()).ReadToEnd();
+
+        // Create a dictionary to store relevant headers
+        Dictionary<String, String> relevantHeaders = new Dictionary<String, String>();
+
+        // Extract Bing HTTP headers
+        foreach (String header in response.Headers)
+        {
+            if (header.StartsWith("BingAPIs-") || header.StartsWith("X-MSEdge-"))
+                relevantHeaders[header] = response.Headers[header];
+        }
+
+        // Show headers
+        Console.WriteLine("Relevant HTTP Headers:");
+        foreach (var header in relevantHeaders)
+            Console.WriteLine(header.Key + ": " + header.Value);
+
+        Console.WriteLine("JSON Response:");
+
+        dynamic parsedJson = JsonConvert.DeserializeObject(json);
+        var thumbnailUrl = parsedJson.value[0].thumbnailUrl;
+        Console.WriteLine(thumbnailUrl);
+        return thumbnailUrl;
+        //Console.WriteLine(JsonConvert.SerializeObject(parsedJson, Formatting.Indented));
     }
 
     private async Task<UserListItems> InsertNewUser(string userId)

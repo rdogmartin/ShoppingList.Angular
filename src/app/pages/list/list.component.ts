@@ -10,7 +10,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subscription, tap } from 'rxjs';
-import { ListItem, ListItemUpdate, ListItemViewModel } from '../../shared/models/model';
+import { ListItemAdd, ListItemUpdate, ListItemViewModel } from '../../shared/models/model';
 import { ListItemService } from '../../shared/services/listItem.service';
 @Component({
   selector: 'app-list',
@@ -59,7 +59,7 @@ export class ListComponent implements OnInit, OnDestroy {
   public onSubmit() {
     const description = this.listForm.value.newItem;
     if (description && description.length > 0) {
-      this.addItem({ description, isComplete: false });
+      this.addItem({ description });
     }
   }
 
@@ -118,7 +118,7 @@ export class ListComponent implements OnInit, OnDestroy {
     });
   }
 
-  private addItem(item: ListItem) {
+  private addItem(item: ListItemAdd) {
     const subscription = this.listItemService
       .addItem(item)
       .pipe(

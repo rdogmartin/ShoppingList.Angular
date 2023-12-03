@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable, map } from 'rxjs';
-import { ListItem, ListItemUpdate, ListItemViewModel, UserListItems } from '../models/model';
+import { ListItem, ListItemAdd, ListItemUpdate, ListItemViewModel, UserListItems } from '../models/model';
 
 @Injectable({
   providedIn: 'root',
@@ -17,7 +17,7 @@ export class ListItemService {
     return this.http.get<UserListItems>('/api/GetListItems').pipe(map((userListItems) => userListItems.listItems));
   }
 
-  public addItem(item: ListItem) {
+  public addItem(item: ListItemAdd) {
     return this.http
       .post<UserListItems>('/api/AddListItem', item)
       .pipe(map((userListItems) => this.convertToListItemViewModels(userListItems.listItems)));
