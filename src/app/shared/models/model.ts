@@ -21,14 +21,21 @@ export interface UserListItems {
 
 export interface ListItem {
   description: string;
+  imageUrl: string;
   isComplete: boolean;
-}
-
-export interface ListItemUpdate extends ListItem {
-  newDescription: string;
 }
 
 export interface ListItemViewModel extends ListItem {
   isBeingEdited: boolean;
+  newDescription: string;
+}
+
+export interface ListItemAdd {
+  description: string;
+}
+
+export interface ListItemUpdate {
+  description: string;
+  isComplete: boolean;
   newDescription: string;
 }

@@ -30,7 +30,6 @@ public class ListItemFunctions
     {
         log.LogInformation("GetListItems endpoint triggered.");
 
-        //dynamic authResult = null;
         var authResult = this._authService.Authorize(req);
         if (!authResult.IsAuthenticated)
         {
@@ -59,7 +58,7 @@ public class ListItemFunctions
         }
 
         string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-        var itemToAdd = JsonConvert.DeserializeObject<ListItem>(requestBody);
+        var itemToAdd = JsonConvert.DeserializeObject<ListItemAdd>(requestBody);
 
         if (itemToAdd == null)
         {
