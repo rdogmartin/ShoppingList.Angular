@@ -1,9 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Configuration;
-using System.IO;
 using System.Linq;
-using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Api.Dto;
 using Microsoft.Azure.Cosmos;
@@ -67,6 +65,10 @@ public class ListItemService : IListItemService
         _configuration = configuration;
     }
 
+    /// <summary>
+    /// Gets the Bing Search subscription key. This should match one of the keys on the Resource Management => Keys and Endpoint tab in the Bing Search area of the Azure Portal.
+    /// Ex: 1234567890abcdef1234567890abcdef
+    /// </summary>
     public string BingSearchSubscriptionKey
     {
         get
@@ -81,6 +83,10 @@ public class ListItemService : IListItemService
         }
     }
 
+    /// <summary>
+    /// Gets the Bing Search endpoint URL. This should match the endpoint on the Resource Management => Endpoint tab in the Bing Search area of the Azure Portal.
+    /// Ex: https://api.bing.microsoft.com/v7.0/images/search
+    /// </summary>
     public string BingSearchEndpointUrl
     {
         get
@@ -119,7 +125,7 @@ public class ListItemService : IListItemService
 
         if (listItem == null)
         {
-            listItem = new ListItem(itemToAdd.Description, GetThumbnailImageUrl(itemToAdd.Description), false);
+            listItem = new ListItem(itemToAdd.Description, await GetThumbnailImageUrl(itemToAdd.Description), false);
         }
 
         // Mark as NOT complete (mostly relevant when user is adding an item that has been previously completed).
@@ -166,9 +172,10 @@ public class ListItemService : IListItemService
         }
         else
         {
-            // Item is being updated, but not checked/unchecked. Keep it in the same place in the list and update the description.
+            // Item is being updated, but not checked/unchecked. Keep it in the same place in the list and update the description & image URL.
+            var thumbnailUrl = await GetThumbnailImageUrl(itemToUpdate.NewDescription);
             updatedListItems = userListItems.ListItems
-                .Select(listItem => listItem == dbItemToUpdate ? dbItemToUpdate with { Description = itemToUpdate.NewDescription, ImageUrl = GetThumbnailImageUrl(itemToUpdate.NewDescription) } : listItem)
+                .Select(listItem => listItem == dbItemToUpdate ? dbItemToUpdate with { Description = itemToUpdate.NewDescription, ImageUrl = thumbnailUrl } : listItem)
                 .OrderBy(listItem => listItem.IsComplete)
                 .ToArray();
         }
@@ -198,39 +205,25 @@ public class ListItemService : IListItemService
         return response.Resource;
     }
 
-    private string GetThumbnailImageUrl(string itemDescription)
+    private async Task<string> GetThumbnailImageUrl(string itemDescription)
     {
         // More info: https://learn.microsoft.com/en-us/bing/search-apis/bing-image-search/reference/query-parameters
         var uriQuery = $"{BingSearchEndpointUrl}?q={Uri.EscapeDataString(itemDescription)}&count=1";
 
-        // Perform the Web request and get the response
-        WebRequest request = HttpWebRequest.Create(uriQuery);
-        request.Headers["Ocp-Apim-Subscription-Key"] = BingSearchSubscriptionKey;
-        HttpWebResponse response = (HttpWebResponse)request.GetResponseAsync().Result;
-        string json = new StreamReader(response.GetResponseStream()).ReadToEnd();
+        using HttpClient client = new HttpClient();
+        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BingSearchSubscriptionKey);
+        HttpResponseMessage response = await client.GetAsync(uriQuery);
+        string json = await response.Content.ReadAsStringAsync();
 
-        // Create a dictionary to store relevant headers
-        Dictionary<String, String> relevantHeaders = new Dictionary<String, String>();
-
-        // Extract Bing HTTP headers
-        foreach (String header in response.Headers)
+        if (string.IsNullOrWhiteSpace(json))
         {
-            if (header.StartsWith("BingAPIs-") || header.StartsWith("X-MSEdge-"))
-                relevantHeaders[header] = response.Headers[header];
+            return string.Empty;
         }
 
-        // Show headers
-        Console.WriteLine("Relevant HTTP Headers:");
-        foreach (var header in relevantHeaders)
-            Console.WriteLine(header.Key + ": " + header.Value);
-
-        Console.WriteLine("JSON Response:");
-
-        dynamic parsedJson = JsonConvert.DeserializeObject(json);
+        dynamic parsedJson = JsonConvert.DeserializeObject(json)!;
         var thumbnailUrl = parsedJson.value[0].thumbnailUrl;
-        Console.WriteLine(thumbnailUrl);
+
         return thumbnailUrl;
-        //Console.WriteLine(JsonConvert.SerializeObject(parsedJson, Formatting.Indented));
     }
 
     private async Task<UserListItems> InsertNewUser(string userId)
