@@ -5,11 +5,11 @@
   </div>
 </form>
 
-@if (userListItems()) {
-@for (listItem of userListItems(); track listItem.description) {
-<div class="flex items-start hover:bg-neutral-100 dark:hover:bg-neutral-700 focus-within:bg-neutral-100 dark:focus-within:bg-neutral-700">
+@if (listItems()) {
+@for (listItem of listItems(); track listItem.description) {
+<div class="flex items-start hover:bg-neutral-100 dark:hover:bg-neutral-700 focus-within:bg-neutral-100 dark:focus-within:bg-neutral-700" [ngClass]="{ 'item-container-active': listItem.isBeingEdited}">
   <mat-checkbox class="mt-1" [checked]="listItem.isComplete" (change)="onCheckboxChange($event, listItem)" [ngClass]="{ 'line-through': listItem.isComplete }" />
-  <input type="text" class="grow h-12 p-3 mr-1 bg-transparent border-none " [value]="listItem.description" enterkeyhint="done">
+  <input type="text" class="grow h-12 p-3 mr-1 bg-transparent border-none " [value]="listItem.description" enterkeyhint="done" (focus)="beginEditListItem(listItem)" (keyup)="onKeyUpListItem($event, listItem)">
 
   <button mat-icon-button (click)="saveListItem(listItem)" class="invisible " aria-label="Update this item">
     <mat-icon>done</mat-icon>
