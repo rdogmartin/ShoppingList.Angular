@@ -72,6 +72,16 @@ export class ListComponent implements OnInit, OnDestroy {
     });
   }
 
+  public beginEditListItem(listItem: ListItemViewModel) {
+    this.listItems()?.forEach((item) => (item.isBeingEdited = false));
+    listItem.isBeingEdited = true;
+  }
+
+  public onKeyUpListItem(e: Event, listItem: ListItemViewModel) {
+    const description = (e.target as HTMLInputElement).value;
+    listItem.newDescription = description;
+  }
+
   public saveListItem(listItem: ListItemViewModel) {
     const subscription = this.listItemService
       .updateItem({
@@ -100,19 +110,6 @@ export class ListComponent implements OnInit, OnDestroy {
       .subscribe();
 
     this.subscriptions.add(subscription);
-  }
-
-  public beginEditListItem(listItem: ListItemViewModel) {
-    this.listItems()?.forEach((item) => (item.isBeingEdited = false));
-    listItem.isBeingEdited = true;
-  }
-
-  public onKeyUpListItem(e: Event, listItem: ListItemViewModel) {
-    const description = (e.target as HTMLInputElement).value;
-    listItem.newDescription = description;
-    // if (e.key === 'Enter') {
-    //   this.saveListItem(listItem);
-    // }
   }
 
   private initializeForm() {
