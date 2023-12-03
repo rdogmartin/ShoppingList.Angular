@@ -88,7 +88,7 @@ public class ListItemFunctions
         string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
 
         // TODO: Validate that the request body is a valid ListItem.
-        var itemToUpdate = JsonConvert.DeserializeObject<ListItem>(requestBody);
+        var itemToUpdate = JsonConvert.DeserializeObject<ListItemUpdate>(requestBody);
 
         if (itemToUpdate == null)
         {
@@ -96,6 +96,32 @@ public class ListItemFunctions
         }
 
         var userListItems = await _listItemService.UpdateListItem(authResult.User.Identity?.Name ?? "Unknown", itemToUpdate);
+
+        return await Task.FromResult<ActionResult>(new OkObjectResult(userListItems));
+    }
+
+    [FunctionName("DeleteListItem")]
+    public async Task<IActionResult> Delete(
+        [HttpTrigger(AuthorizationLevel.Anonymous, "delete", Route = null)] HttpRequest req,
+        ILogger log)
+    {
+        log.LogInformation("DeleteListItem endpoint triggered.");
+
+        var authResult = this._authService.Authorize(req);
+        if (!authResult.IsAuthenticated)
+        {
+            log.LogWarning("User not authenticated. Aborting invocation of Api.Functions.ListItemFunctions.DeleteListItem");
+            return await Task.FromResult<IActionResult>(new UnauthorizedResult());
+        }
+
+        var itemDescription = req.Query["item"];
+
+        if (string.IsNullOrWhiteSpace(itemDescription))
+        {
+            return await Task.FromResult<ActionResult>(new OkResult());
+        }
+
+        var userListItems = await _listItemService.DeleteListItem(authResult.User.Identity?.Name ?? "Unknown", itemDescription);
 
         return await Task.FromResult<ActionResult>(new OkObjectResult(userListItems));
     }

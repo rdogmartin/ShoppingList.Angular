@@ -23,3 +23,12 @@ export interface ListItem {
   description: string;
   isComplete: boolean;
 }
+
+export interface ListItemUpdate extends ListItem {
+  newDescription: string;
+}
+
+export interface ListItemViewModel extends ListItem {
+  isBeingEdited: boolean;
+  newDescription: string;
+}

@@ -24,7 +24,7 @@ public interface IListItemService
     /// </summary>
     /// <param name="userId">A unique identifier for the user. Ex: myname@outlook.com</param>
     /// <param name="itemToAdd">The item to add</param>
-    /// <returns>The full list of items, including the newly added one.</returns>
+    /// <returns>The full list of items as they exist in the data store immediately after the addition.</returns>
     Task<UserListItems> AddListItem(string userId, ListItem itemToAdd);
 
     /// <summary>
@@ -34,8 +34,17 @@ public interface IListItemService
     /// </summary>
     /// <param name="userId">A unique identifier for the user. Ex: myname@outlook.com</param>
     /// <param name="itemToUpdate">The item to update</param>
-    /// <returns>The full list of items, including the newly added one.</returns>
-    Task<UserListItems> UpdateListItem(string userId, ListItem itemToUpdate);
+    /// <returns>The full list of items as they exist in the data store immediately after the update.</returns>
+    Task<UserListItems> UpdateListItem(string userId, ListItemUpdate itemToUpdate);
+
+    /// <summary>
+    /// Permanently remove the item belonging to the specified user from their list.
+    /// </summary>
+    /// <param name="userId">A unique identifier for the user. Ex: myname@outlook.com</param>
+    /// <param name="itemDescription">The name of the item to delete.</param>
+    /// <returns>The full list of items as they exist in the data store immediately after the deletion.</returns>
+    Task<UserListItems> DeleteListItem(string userId, string itemDescription);
+
 }
 
 /// <inheritdoc />
@@ -85,35 +94,61 @@ public class ListItemService : IListItemService
         return response.Resource;
     }
 
-    public async Task<UserListItems> UpdateListItem(string userId, ListItem itemToUpdate)
+    public async Task<UserListItems> UpdateListItem(string userId, ListItemUpdate itemToUpdate)
     {
         var userListItems = await GetListItems(userId);
 
-        var dbItemToUpdate = userListItems.ListItems.FirstOrDefault(i => i.Description == itemToUpdate.Description);
+        var dbItemToUpdate = userListItems.ListItems.FirstOrDefault(i => i.Description.Equals(itemToUpdate.Description, StringComparison.OrdinalIgnoreCase));
 
         if (dbItemToUpdate == null)
         {
-            return await this.AddListItem(userId, itemToUpdate);
+            return await this.AddListItem(userId, new ListItem(itemToUpdate.Description, itemToUpdate.IsComplete));
         }
 
         ListItem[] updatedListItems;
         if (dbItemToUpdate.IsComplete && !itemToUpdate.IsComplete)
         {
             // Item is being unchecked. Move it to the top of the list.
-            updatedListItems = userListItems.ListItems.Where(listItem => listItem != dbItemToUpdate).Prepend(itemToUpdate).ToArray();
+            updatedListItems = userListItems.ListItems
+                .Where(listItem => listItem != dbItemToUpdate)
+                .Prepend(dbItemToUpdate with { IsComplete = itemToUpdate.IsComplete })
+                .ToArray();
         }
         else if (!dbItemToUpdate.IsComplete && itemToUpdate.IsComplete)
         {
             // Item is being checked. Move it to the beginning of the complete items.
-            updatedListItems = userListItems.ListItems.Where(li => !li.IsComplete && li != dbItemToUpdate).Append(itemToUpdate).Concat(userListItems.ListItems.Where(li => li.IsComplete)).ToArray();
+            updatedListItems = userListItems.ListItems
+                .Where(li => !li.IsComplete && li != dbItemToUpdate)
+                .Append(dbItemToUpdate with { IsComplete = itemToUpdate.IsComplete })
+                .Concat(userListItems.ListItems.Where(li => li.IsComplete))
+                .ToArray();
         }
         else
         {
-            // Item is being updated, but not checked/unchecked. Keep it in the same place in the list.
-            updatedListItems = userListItems.ListItems.Select(listItem => listItem == dbItemToUpdate ? itemToUpdate : listItem).OrderBy(listItem => listItem.IsComplete).ToArray();
+            // Item is being updated, but not checked/unchecked. Keep it in the same place in the list and update the description.
+            updatedListItems = userListItems.ListItems
+                .Select(listItem => listItem == dbItemToUpdate ? dbItemToUpdate with { Description = itemToUpdate.NewDescription } : listItem)
+                .OrderBy(listItem => listItem.IsComplete)
+                .ToArray();
         }
 
         userListItems = userListItems with { ListItems = updatedListItems };
+
+        ItemResponse<UserListItems> response = await _container.UpsertItemAsync(
+            item: userListItems
+        );
+
+        return response.Resource;
+    }
+
+    public async Task<UserListItems> DeleteListItem(string userId, string itemDescription)
+    {
+        var userListItems = await GetListItems(userId);
+
+        userListItems = userListItems with
+        {
+            ListItems = userListItems.ListItems.Where(listItem => !listItem.Description.Equals(itemDescription, StringComparison.OrdinalIgnoreCase)).ToArray()
+        };
 
         ItemResponse<UserListItems> response = await _container.UpsertItemAsync(
             item: userListItems
