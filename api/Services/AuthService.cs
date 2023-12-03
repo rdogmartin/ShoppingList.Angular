@@ -32,10 +32,10 @@ public class AuthService : IAuthService
             var data = header[0];
             var decoded = Convert.FromBase64String(data);
             var json = Encoding.UTF8.GetString(decoded);
-            principal = JsonSerializer.Deserialize<ClientPrincipal>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            principal = JsonSerializer.Deserialize<ClientPrincipal>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? throw new InvalidOperationException("Unable to parse the HTTP request header x-ms-client-principal into a ClientPrincipal instance.");
         }
 
-        principal = principal with { UserRoles = principal.UserRoles?.Except(new string[] { "anonymous" }, StringComparer.CurrentCultureIgnoreCase) };
+        principal = principal with { UserRoles = principal.UserRoles.Except(new[] { "anonymous" }, StringComparer.OrdinalIgnoreCase) ?? throw new InvalidOperationException() };
 
         if (!principal.UserRoles.Any())
         {
