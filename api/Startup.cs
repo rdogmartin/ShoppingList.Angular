@@ -32,16 +32,16 @@ public class Startup : FunctionsStartup
 
     private static CosmosClient GetCosmosClient()
     {
-        string endpoint = Configuration["CosmosEndPointUrl"];
-        if (string.IsNullOrEmpty(endpoint))
+        string endpoint = Configuration["CosmosDb:EndPointUrl"];
+        if (string.IsNullOrEmpty(endpoint) || endpoint.StartsWith("Put actual key in secrets.json"))
         {
-            throw new ConfigurationErrorsException("Please specify a valid endpoint in the appSettings.json file or your Azure Functions Settings.");
+            throw new ConfigurationErrorsException("Missing setting 'CosmosDb:EndPointUrl'. Please specify a valid endpoint in the appSettings.json file or your Azure Functions Settings.");
         }
 
-        string authKey = Configuration["CosmosAuthorizationKey"];
-        if (string.IsNullOrEmpty(authKey) || string.Equals(authKey, "Put actual key in secrets.json"))
+        string authKey = Configuration["CosmosDb:AuthorizationKey"];
+        if (string.IsNullOrEmpty(authKey) || authKey.StartsWith("Put actual key in secrets.json"))
         {
-            throw new ConfigurationErrorsException("Please specify a valid AuthorizationKey in secrets.json, the appSettings.json file or your Azure Functions Settings.");
+            throw new ConfigurationErrorsException("Missing setting 'CosmosDb:AuthorizationKey'. Please specify a valid AuthorizationKey in secrets.json, the appSettings.json file or your Azure Functions Settings.");
         }
 
         var configurationBuilder = new CosmosClientBuilder(endpoint, authKey);
