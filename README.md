@@ -1,6 +1,6 @@
 # Shopping List
 
-A simple shopping list app built with cloud native Azure services, including Static Web Apps with Angular, Azure Functions,
+A simple shopping list app built with cloud-native Azure services, including Static Web Apps with Angular, Azure Functions,
 Cosmos DB, Azure Bing Search and Microsoft Account social login.
 
 This repo can be forked and deployed to your own Azure subscription using entirely free Azure offerings. Share it with
