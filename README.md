@@ -33,8 +33,8 @@ To run it locally, you'll need:
 
 ## Running it locally
 
-Before running it the first time, you'll need to configure it for your Cosmos DB and Bing Search subscription. Acquire the keys
-from the [Azure Portal](https://portal.azure.com/) and enter them into appSettings.json or a local
+Before running it the first time, you'll need to configure it to connect to your Cosmos DB and Bing Search subscription.
+Acquire the keys from the [Azure Portal](https://portal.azure.com/) and enter them into appSettings.json or a local
 [secrets.json](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) file.
 
 > ⚠️ WARNING: Do not commit `appSettings.json` to source control with your secrets.
@@ -53,3 +53,33 @@ Then run this command in a VSCode terminal:
 Or use the shortcut defined in `package.json`:
 
 `npm run start:swa-no-api`
+
+## Deploying to your own Azure subscription
+
+1. Create a [Static Web App](https://learn.microsoft.com/en-us/azure/static-web-apps/overview) in the Azure Portal.
+1. If you haven't already done so already, create a
+   [Bing Search account in Azure](https://www.microsoft.com/en-us/bing/apis/bing-web-search-api) and a
+   [Cosmos DB database](https://learn.microsoft.com/en-us/azure/cosmos-db/nosql/quickstart-portal)
+   named `ToDoList` with a container named `Items`.
+
+   > 💡 TIP: This application works with the free tier of each Azure service, so no out of pocket costs are required.
+
+1. In the Azure Portal, navigate to the Configuration page for your Static Web App. Create four new application settings
+   with the following names and values:
+
+   - `BingSearch__EndPointUrl` - The URL of your Bing Search service. Find it on the Keys and Endpoint page of your Bing Search
+     service.
+   - `BingSearch__SubscriptionKey` - Your Bing Search subscription key. Find it on the Keys and Endpoint page of your Bing
+     Search service.
+   - `CosmosDb__AuthorizationKey` - Your Cosmos DB authorization key. Find it on the Keys page of your Cosmos DB database.
+   - `CosmosDb__EndPointUrl` - Your Cosmos DB endpoint URI. Find it on the Keys page of your Cosmos DB database.
+
+   ![Azure Static Web App configuration](readme-images/sl-azure-config.jpg)
+
+1. Fork this repo.
+1. In your forked repo, create a new GitHub Actions secret named `AZURE_STATIC_WEB_APPS_API_TOKEN` with the value
+   of the deployment token from the Static Web App you created in step 1. This links your repo to your Azure Static Web App.
+   [More info](https://learn.microsoft.com/en-us/azure/static-web-apps/deployment-token-management)
+
+1. Create an arbitrary commit and push your changes to GitHub. The GitHub Action will build and deploy your app to Azure.
+   You can view the progress in the Actions tab of your repo.
