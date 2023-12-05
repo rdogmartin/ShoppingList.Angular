@@ -2,3 +2,7 @@
 .item-container-active > button {
   visibility: visible;
 }
+
+:nth-last-child(1 of .incomplete) {
+  border-bottom: 0.09rem solid #ccc;
+}
