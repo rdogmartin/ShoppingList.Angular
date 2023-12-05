@@ -1,6 +1,6 @@
 # Shopping List
 
-A shopping list app optimized for efficiency and practicality. It does what a shopping list app should do and not a darn
+A shopping list app optimized for efficiency and practicality. It does what a shopping list should do and not a darn
 thing more.
 
 Built with cloud-native Azure services, including Static Web Apps with Angular, Azure Functions, Cosmos DB, Azure Bing Search
@@ -37,7 +37,7 @@ To run it locally, you'll need:
 ## Running it locally
 
 Before running it the first time, you'll need to configure it to connect to your Cosmos DB and Bing Search subscription.
-Acquire the keys from the [Azure Portal](https://portal.azure.com/) and enter them into appSettings.json or a local
+Acquire the keys from the [Azure Portal](https://portal.azure.com/) and enter them into `appSettings.json` or a local
 [secrets.json](https://learn.microsoft.com/en-us/aspnet/core/security/app-secrets) file.
 
 > ⚠️ WARNING: Do not commit `appSettings.json` to source control with your secrets.
@@ -46,6 +46,8 @@ Acquire the keys from the [Azure Portal](https://portal.azure.com/) and enter th
 
 Run `npx swa start` to run both the front and back end pieces, then navigate to http://localhost:4280 in a browser. Note that
 any breakpoints you set in the C# code will not be hit.
+
+> 💡 TIP: `swa` is part of the [Static Web Apps CLI](https://azure.github.io/static-web-apps-cli/), so be sure to install that.
 
 To allow debugging the API services and support hot reload, use Visual Studio to open `api.csproj` and start a debugging session. It is expected this will start the API on port 7135 (http://localhost:7135/).
 
