@@ -8,7 +8,11 @@
 @if (listItems()) {
 @for (listItem of listItems(); track listItem.description) {
 <div class="flex items-center hover:bg-neutral-100 dark:hover:bg-neutral-700 focus-within:bg-neutral-100 dark:focus-within:bg-neutral-700" [ngClass]="[listItem.isComplete ? 'completed' : 'incomplete', listItem.isBeingEdited ? 'item-container-active' : '']">
+  @if (listItem.isBeingEdited && apiCallInProgress) {
+  <mat-spinner class="ml-2 mr-3" diameter="20"></mat-spinner>
+  } @else {
   <mat-checkbox class="mt-1" [checked]="listItem.isComplete" (change)="onCheckboxChange($event, listItem)" [ngClass]="{ 'line-through': listItem.isComplete }" />
+  }
   <img [src]="listItem.imageUrl" class="w-8 h-8" alt="{{listItem.description}}" [ngClass]="{ 'hidden': !listItem.imageUrl }" />
   <input type="text" class="grow h-12 p-3 mr-1 bg-transparent border-none" [ngClass]="{ 'line-through': listItem.isComplete}" [value]="listItem.description" enterkeyhint="done" (focus)="beginEditListItem(listItem)" (keyup)="onKeyUpListItem($event, listItem)" (keydown.enter)="saveListItem(listItem)">
 
