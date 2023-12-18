@@ -9,7 +9,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Subscription, tap } from 'rxjs';
+import { Subscription, finalize, tap } from 'rxjs';
 import { ListItemAdd, ListItemUpdate, ListItemViewModel } from '../../shared/models/model';
 import { ListItemService } from '../../shared/services/listItem.service';
 @Component({
@@ -39,7 +39,7 @@ export class ListComponent implements OnInit, OnDestroy {
     newItem: FormControl<string | null>;
   }>;
 
-  public itemContainerActive = false;
+  public apiCallInProgress = false;
 
   private subscriptions = new Subscription();
 
@@ -65,6 +65,7 @@ export class ListComponent implements OnInit, OnDestroy {
 
   public onCheckboxChange(event: MatCheckboxChange, listItem: ListItemViewModel) {
     listItem.isComplete = event.checked;
+    listItem.isBeingEdited = true;
     this.updateItem({
       description: listItem.description,
       isComplete: listItem.isComplete,
@@ -119,13 +120,24 @@ export class ListComponent implements OnInit, OnDestroy {
   }
 
   private addItem(item: ListItemAdd) {
+    // Insert the item in the list so that the UI updates immediately, then call the API to add it to the database.
+    const newListItem: ListItemViewModel = {
+      description: item.description,
+      imageUrl: '',
+      isComplete: false,
+      isBeingEdited: true,
+      newDescription: '',
+    };
+
+    this.listItems()?.unshift(newListItem);
+    this.listForm.controls.newItem.reset();
+    this.apiCallInProgress = true;
+
     const subscription = this.listItemService
       .addItem(item)
       .pipe(
-        tap((listItems) => {
-          this.listItems = signal(listItems);
-          this.listForm.controls.newItem.reset();
-        }),
+        tap((listItems) => (this.listItems = signal(listItems))),
+        finalize(() => (this.apiCallInProgress = false)),
       )
       .subscribe();
 
@@ -133,9 +145,14 @@ export class ListComponent implements OnInit, OnDestroy {
   }
 
   private updateItem(itemToUpdate: ListItemUpdate) {
+    this.apiCallInProgress = true;
+
     const subscription = this.listItemService
       .updateItem(itemToUpdate)
-      .pipe(tap((listItems) => (this.listItems = signal(listItems))))
+      .pipe(
+        tap((listItems) => (this.listItems = signal(listItems))),
+        finalize(() => (this.apiCallInProgress = false)),
+      )
       .subscribe();
 
     this.subscriptions.add(subscription);
