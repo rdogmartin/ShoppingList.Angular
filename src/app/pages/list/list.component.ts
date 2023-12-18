@@ -1,6 +1,6 @@
 import { A11yModule } from '@angular/cdk/a11y';
 import { CommonModule } from '@angular/common';
-import { Component, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, HostListener, OnDestroy, OnInit, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
@@ -11,6 +11,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subscription, finalize, tap } from 'rxjs';
 import { ListItemAdd, ListItemUpdate, ListItemViewModel } from '../../shared/models/model';
+import { AuthService } from '../../shared/services/auth.service';
+import { BrowserService } from '../../shared/services/browser.service';
 import { ListItemService } from '../../shared/services/listItem.service';
 @Component({
   selector: 'app-list',
@@ -44,6 +46,8 @@ export class ListComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
 
   constructor(
+    private authService: AuthService,
+    private browserService: BrowserService,
     private formBuilder: FormBuilder,
     private listItemService: ListItemService,
   ) {}
@@ -54,6 +58,23 @@ export class ListComponent implements OnInit, OnDestroy {
 
   public ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
+  }
+
+  @HostListener('window:focus', ['$event'])
+  onFocus(): void {
+    // When the browser tab gets focus, check if the user is still logged in. If not, redirect to the login page.
+    const subscription = this.authService.isLoggedIn$
+      .pipe(
+        tap((isLoggedIn) => {
+          console.log('window:focus event triggered login status check. isLoggedIn: ', isLoggedIn);
+          if (!isLoggedIn) {
+            this.browserService.redirectToPage('/.auth/login/aad');
+          }
+        }),
+      )
+      .subscribe();
+
+    this.subscriptions.add(subscription);
   }
 
   public onSubmit() {
@@ -78,35 +99,35 @@ export class ListComponent implements OnInit, OnDestroy {
     listItem.isBeingEdited = true;
   }
 
-  public onKeyUpListItem(e: Event, listItem: ListItemViewModel) {
-    const description = (e.target as HTMLInputElement).value;
-    listItem.newDescription = description;
+  public onFocusAddListItem() {
+    this.listItems()?.forEach((item) => (item.isBeingEdited = false));
   }
 
-  public saveListItem(listItem: ListItemViewModel) {
-    const subscription = this.listItemService
-      .updateItem({
-        description: listItem.description,
-        isComplete: listItem.isComplete,
-        newDescription: listItem.newDescription,
-      })
-      .pipe(
-        tap((listItems) => {
-          this.listItems = signal(listItems);
-        }),
-      )
-      .subscribe();
+  public onKeyUpEditListItem(e: KeyboardEvent, listItem: ListItemViewModel) {
+    if (e.key === 'Escape') {
+      listItem.isBeingEdited = false;
+    } else {
+      const description = (e.target as HTMLInputElement).value;
+      listItem.newDescription = description;
+    }
+  }
 
-    this.subscriptions.add(subscription);
+  public updateItemDescription(listItem: ListItemViewModel) {
+    this.updateItem({
+      description: listItem.description,
+      isComplete: listItem.isComplete,
+      newDescription: listItem.newDescription,
+    });
   }
 
   public deleteListItem(listItem: ListItemViewModel) {
+    this.apiCallInProgress = true;
+
     const subscription = this.listItemService
       .deleteItem(listItem)
       .pipe(
-        tap((listItems) => {
-          this.listItems = signal(listItems);
-        }),
+        tap((listItems) => (this.listItems = signal(listItems))),
+        finalize(() => (this.apiCallInProgress = false)),
       )
       .subscribe();
 
