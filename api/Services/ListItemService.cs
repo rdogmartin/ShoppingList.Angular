@@ -127,6 +127,11 @@ public class ListItemService : IListItemService
         {
             listItem = new ListItem(itemToAdd.Description, await GetThumbnailImageUrl(itemToAdd.Description), false);
         }
+        else
+        {
+            // Update the description (useful if the user has changed the capitalization).
+            listItem = listItem with { Description = itemToAdd.Description };
+        }
 
         // Mark as NOT complete (mostly relevant when user is adding an item that has been previously completed).
         listItem = listItem with { IsComplete = false };
@@ -175,7 +180,9 @@ public class ListItemService : IListItemService
             // Item is being updated, but not checked/unchecked. Keep it in the same place in the list and update the description & image URL.
             var thumbnailUrl = await GetThumbnailImageUrl(itemToUpdate.NewDescription);
             updatedListItems = userListItems.ListItems
-                .Select(listItem => listItem == dbItemToUpdate ? dbItemToUpdate with { Description = itemToUpdate.NewDescription, ImageUrl = thumbnailUrl } : listItem)
+                .Select(listItem => listItem == dbItemToUpdate ? dbItemToUpdate with { Description = itemToUpdate.NewDescription, ImageUrl = thumbnailUrl } : listItem) // Update the description and image URL of the item we're updating.
+                .GroupBy(listItem => new { Item1 = listItem.Description.ToUpperInvariant(), Item2 = listItem.ImageUrl.ToUpperInvariant() })
+                .Select(g => g.First()) // This .GroupBy and .Select removes any duplicates (e.g. when renaming an item to match an existing one).
                 .OrderBy(listItem => listItem.IsComplete)
                 .ToArray();
         }
