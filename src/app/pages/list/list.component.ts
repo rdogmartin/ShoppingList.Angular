@@ -66,7 +66,6 @@ export class ListComponent implements OnInit, OnDestroy {
     const subscription = this.authService.isLoggedIn$
       .pipe(
         tap((isLoggedIn) => {
-          console.log('window:focus event triggered login status check. isLoggedIn: ', isLoggedIn);
           if (!isLoggedIn) {
             this.browserService.redirectToPage('/.auth/login/aad');
           }
@@ -97,6 +96,7 @@ export class ListComponent implements OnInit, OnDestroy {
   public beginEditListItem(listItem: ListItemViewModel) {
     this.listItems()?.forEach((item) => (item.isBeingEdited = false));
     listItem.isBeingEdited = true;
+    listItem.newDescription = listItem.description;
   }
 
   public onFocusAddListItem() {
@@ -106,6 +106,8 @@ export class ListComponent implements OnInit, OnDestroy {
   public onKeyUpEditListItem(e: KeyboardEvent, listItem: ListItemViewModel) {
     if (e.key === 'Escape') {
       listItem.isBeingEdited = false;
+      (e.target as HTMLInputElement).value = listItem.description;
+      listItem.newDescription = '';
     } else {
       const description = (e.target as HTMLInputElement).value;
       listItem.newDescription = description;
@@ -113,11 +115,13 @@ export class ListComponent implements OnInit, OnDestroy {
   }
 
   public updateItemDescription(listItem: ListItemViewModel) {
-    this.updateItem({
-      description: listItem.description,
-      isComplete: listItem.isComplete,
-      newDescription: listItem.newDescription,
-    });
+    if (listItem.description !== listItem.newDescription) {
+      this.updateItem({
+        description: listItem.description,
+        isComplete: listItem.isComplete,
+        newDescription: listItem.newDescription,
+      });
+    }
   }
 
   public deleteListItem(listItem: ListItemViewModel) {
