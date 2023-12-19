@@ -129,12 +129,10 @@ public class ListItemService : IListItemService
         }
         else
         {
-            // Update the description (useful if the user has changed the capitalization).
-            listItem = listItem with { Description = itemToAdd.Description };
+            // Update the description (useful if the user has changed the capitalization) and mark as NOT complete
+            // (useful when user is adding an item that has been previously completed).
+            listItem = listItem with { Description = itemToAdd.Description, IsComplete = false };
         }
-
-        // Mark as NOT complete (mostly relevant when user is adding an item that has been previously completed).
-        listItem = listItem with { IsComplete = false };
 
         // Add the item to the beginning of the list, excluding any that have the same name that already exist.
         userListItems = userListItems with { ListItems = userListItems.ListItems.Where(li => !li.Description.Equals(itemToAdd.Description, StringComparison.OrdinalIgnoreCase)).Prepend(listItem).ToArray() };
