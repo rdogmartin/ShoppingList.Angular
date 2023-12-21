@@ -9,17 +9,17 @@
 @for (listItem of listItems(); track listItem.description) {
 <div class="flex items-center hover:bg-neutral-100 dark:hover:bg-neutral-700 focus-within:bg-neutral-100 dark:focus-within:bg-neutral-700" [ngClass]="[listItem.isComplete ? 'completed' : 'incomplete', listItem.isBeingEdited ? 'item-container-active' : '']">
   @if (listItem.isBeingEdited && apiCallInProgress) {
-  <mat-spinner class="ml-2 mr-3" diameter="20"></mat-spinner>
+  <mat-spinner class="ml-2 mr-3 flex-none" diameter="20"></mat-spinner>
   } @else {
-  <mat-checkbox class="mt-1" [checked]="listItem.isComplete" (change)="onCheckboxChange($event, listItem)" [ngClass]="{ 'line-through': listItem.isComplete }" />
+  <mat-checkbox class="mt-1 flex-none" [checked]="listItem.isComplete" (change)="onCheckboxChange($event, listItem)" [ngClass]="{ 'line-through': listItem.isComplete }" />
   }
-  <img [src]="listItem.imageUrl" class="w-8 h-8" alt="{{listItem.description}}" [ngClass]="{ 'hidden': !listItem.imageUrl }" />
-  <input type="text" class="grow h-12 p-3 mr-1 bg-transparent border-none" [ngClass]="{ 'line-through': listItem.isComplete}" [value]="listItem.description" enterkeyhint="done" (focus)="beginEditListItem(listItem)" (keyup)="onKeyUpEditListItem($event, listItem)" (keydown.enter)="updateItemDescription(listItem)">
+  <img [src]="listItem.imageUrl" class="w-8 h-8 flex-none" alt="{{listItem.description}}" [ngClass]="{ 'hidden': !listItem.imageUrl }" />
+  <input type="text" class="flex-1 h-12 p-3 mr-1 bg-transparent border-none" [ngClass]="{ 'line-through': listItem.isComplete}" [value]="listItem.description" enterkeyhint="done" (focus)="beginEditListItem(listItem)" (keyup)="onKeyUpEditListItem($event, listItem)" (keydown.enter)="updateItemDescription(listItem)">
 
-  <button mat-icon-button (click)="updateItemDescription(listItem)" class="invisible " aria-label="Update this item">
+  <button mat-icon-button (click)="updateItemDescription(listItem)" class="invisible flex-none" aria-label="Update this item">
     <mat-icon>done</mat-icon>
   </button>
-  <button mat-icon-button (click)="deleteListItem(listItem)" class="invisible " aria-label="Delete this item">
+  <button mat-icon-button (click)="deleteListItem(listItem)" class="invisible flex-none" aria-label="Delete this item">
     <mat-icon>delete</mat-icon>
   </button>
 </div>
