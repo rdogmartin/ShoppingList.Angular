@@ -1,7 +1,7 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <AzureFunctionsVersion>v4</AzureFunctionsVersion>
     <AssemblyVersion>1.1.0</AssemblyVersion>
     <UserSecretsId>106e2527-4a88-4a67-9a8a-64cbd36afe34</UserSecretsId>
@@ -21,8 +21,8 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Functions.Extensions" Version="1.1.0" />
     <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="4.9.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="6.0.1" />
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="4.6.0" />
   </ItemGroup>
 
