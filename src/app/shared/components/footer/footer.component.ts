@@ -6,11 +6,10 @@ import { AppInfoService } from '../../services/appInfo.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
-  selector: 'app-footer',
-  standalone: true,
-  imports: [CommonModule],
-  templateUrl: './footer.component.html',
-  styleUrl: './footer.component.scss',
+    selector: 'app-footer',
+    imports: [CommonModule],
+    templateUrl: './footer.component.html',
+    styleUrl: './footer.component.scss'
 })
 export class FooterComponent {
   model$ = combineLatest([this.appInfoService.getAppInfo(), this.authService.getCurrentUser()]).pipe(
