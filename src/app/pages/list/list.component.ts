@@ -15,21 +15,20 @@ import { AuthService } from '../../shared/services/auth.service';
 import { BrowserService } from '../../shared/services/browser.service';
 import { ListItemService } from '../../shared/services/listItem.service';
 @Component({
-  selector: 'app-list',
-  standalone: true,
-  imports: [
-    A11yModule,
-    CommonModule,
-    MatButtonModule,
-    MatCheckboxModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
-    ReactiveFormsModule,
-  ],
-  templateUrl: './list.component.html',
-  styleUrl: './list.component.scss',
+    selector: 'app-list',
+    imports: [
+        A11yModule,
+        CommonModule,
+        MatButtonModule,
+        MatCheckboxModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        MatProgressSpinnerModule,
+        ReactiveFormsModule,
+    ],
+    templateUrl: './list.component.html',
+    styleUrl: './list.component.scss'
 })
 export class ListComponent implements OnInit, OnDestroy {
   public listItems = toSignal(this.listItemService.getListItemViewModels(), {
