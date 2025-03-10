@@ -15,20 +15,20 @@ import { AuthService } from '../../shared/services/auth.service';
 import { BrowserService } from '../../shared/services/browser.service';
 import { ListItemService } from '../../shared/services/listItem.service';
 @Component({
-    selector: 'app-list',
-    imports: [
-        A11yModule,
-        CommonModule,
-        MatButtonModule,
-        MatCheckboxModule,
-        MatFormFieldModule,
-        MatIconModule,
-        MatInputModule,
-        MatProgressSpinnerModule,
-        ReactiveFormsModule,
-    ],
-    templateUrl: './list.component.html',
-    styleUrl: './list.component.scss'
+  selector: 'app-list',
+  imports: [
+    A11yModule,
+    CommonModule,
+    MatButtonModule,
+    MatCheckboxModule,
+    MatFormFieldModule,
+    MatIconModule,
+    MatInputModule,
+    MatProgressSpinnerModule,
+    ReactiveFormsModule,
+  ],
+  templateUrl: './list.component.html',
+  styleUrl: './list.component.scss',
 })
 export class ListComponent implements OnInit, OnDestroy {
   public listItems = toSignal(this.listItemService.getListItemViewModels(), {
@@ -64,7 +64,7 @@ export class ListComponent implements OnInit, OnDestroy {
     // When the browser tab gets focus, check if the user is still logged in. If not, redirect to the login page.
     const subscription = this.authService.isLoggedIn$
       .pipe(
-        tap((isLoggedIn) => {
+        tap((isLoggedIn: boolean) => {
           if (!isLoggedIn) {
             this.browserService.redirectToPage('/.auth/login/aad');
           }
