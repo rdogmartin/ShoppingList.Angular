@@ -1,5 +1,5 @@
 /* You can add global styles to this file, and also import other style files */
-@import "./app/theme/themes";
+@use "./app/theme/themes";
 
 // Add tailwindcss for CSS utilities (https://tailwindcss.com)
 @tailwind base;

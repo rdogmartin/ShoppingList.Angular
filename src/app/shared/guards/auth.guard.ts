@@ -13,7 +13,7 @@ export const authGuard: CanActivateFn = () => {
       if (isLoggedIn) {
         return true;
       } else {
-        browserService.redirectToPage('/.auth/login/aad');
+        browserService.redirectToPage('/');
         return false;
       }
     }),

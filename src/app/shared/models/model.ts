@@ -1,13 +1,30 @@
+import { StorageItemKey } from './enum';
+
 export interface CurrentUser {
-  userId: string;
-  userRoles: string[];
-  identityProvider: string;
-  userDetails: string;
-  claims: string[];
+  userName: string;
+  isAuthenticated: boolean;
+}
+
+// export interface CurrentUser {
+//   userId: string;
+//   userRoles: string[];
+//   identityProvider: string;
+//   userDetails: string;
+//   claims: string[];
+// }
+
+export interface AuthRequest {
+  userName: string;
 }
 
 export interface AuthResult {
-  clientPrincipal?: CurrentUser;
+  userName: string;
+  isAuthenticated: boolean;
+}
+
+export interface StorageItem {
+  key: StorageItemKey;
+  value: string;
 }
 
 export interface AppInfo {

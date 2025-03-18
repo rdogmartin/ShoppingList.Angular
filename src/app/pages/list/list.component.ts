@@ -31,16 +31,20 @@ import { ListItemService } from '../../shared/services/listItem.service';
   styleUrl: './list.component.scss',
 })
 export class ListComponent implements OnInit, OnDestroy {
-  public listItems = toSignal(this.listItemService.getListItemViewModels(), {
-    initialValue: null,
-    requireSync: false,
-  });
+  public listItems = toSignal(
+    this.listItemService.getListItemViewModels().pipe(finalize(() => (this.apiCallInProgress = false))),
+    {
+      initialValue: null,
+      rejectErrors: true,
+      requireSync: false,
+    },
+  );
 
   public listForm!: FormGroup<{
     newItem: FormControl<string | null>;
   }>;
 
-  public apiCallInProgress = false;
+  public apiCallInProgress = true;
 
   private subscriptions = new Subscription();
 
@@ -66,7 +70,7 @@ export class ListComponent implements OnInit, OnDestroy {
       .pipe(
         tap((isLoggedIn: boolean) => {
           if (!isLoggedIn) {
-            this.browserService.redirectToPage('/.auth/login/aad');
+            this.browserService.redirectToPage('/');
           }
         }),
       )

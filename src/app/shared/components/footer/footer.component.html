@@ -1,19 +1,21 @@
 @if (model$ | async; as model) {
 <footer class="p-1">
-  <p class="p-3 flex items-center font-semibold">
-    @if (!model.user.userDetails) {
-    <a href="/.auth/login/aad" class="border d-block m-2 p-3 border-[#8c8c8c] bg-white text-black hover:bg-slate-200">
-      <img src="assets/images/microsoft.svg" alt="Microsoft Logo" class="w-4 h-4 inline-block mr-2" style="width:21px;height:21px;" />
-      Sign in with Microsoft
-    </a>
-    }
+  <p class="pl-1">
+    @if (!model.user.isAuthenticated) {
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="flex items-start">
+      <input type="text" class="h-12 p-3" formControlName="userName" placeholder="Type email address" value="" [cdkTrapFocusAutoCapture]="true" [cdkTrapFocus]="true" enterkeyhint="done">
+      <button mat-flat-button color="primary" class="ml-2">Log in</button>
+    </div>
+  </form>
+  }
   </p>
   <p class="pt-3 pl-1">
     Version {{model.appInfo.versionNumber}}
   </p>
-  @if (model.user.userDetails) {
+  @if (model.user.isAuthenticated) {
   <p class="pl-1">
-    Logged in as {{model.user.userDetails}}<a href="/.auth/logout" class="m-2 p-1 underline hover:bg-slate-100 dark:hover:bg-slate-700">Log out</a>
+    Logged in as {{model.user.userName}}<button mat-button class="m-2 p-1" (click)="logout()">Log out</button>
   </p>
   }
 </footer>
