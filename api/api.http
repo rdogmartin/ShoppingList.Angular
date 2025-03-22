@@ -1,0 +1,9 @@
+@api_HostAddress = http://localhost:7135
+
+POST {{api_HostAddress}}/api/Authorize
+Content-Type: application/json
+{
+    "userName": "test@gmail.com"
+}
+
+###

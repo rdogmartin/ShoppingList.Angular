@@ -1,52 +1,78 @@
 ﻿using System;
-using System.Linq;
-using System.Security.Claims;
+using System.Collections.Generic;
+using System.IO;
 using System.Text;
-using System.Text.Json;
-using api.Dto;
+using System.Threading.Tasks;
 using Api.Dto;
 using Microsoft.AspNetCore.Http;
+using Newtonsoft.Json;
 
 namespace api.Services;
 
 public interface IAuthService
 {
+    Task<AuthResult> Authenticate(HttpRequest request);
     AuthResult Authorize(HttpRequest request);
 }
 
 public class AuthService : IAuthService
 {
-    public AuthResult Authorize(HttpRequest request)
-    {
-        var user = ParseUser(request);
+    List<string> AuthorizedUsers => new List<string>() { "***REMOVED***", "***REMOVED***", "***REMOVED***" };
 
-        return new AuthResult(user);
+    public async Task<AuthResult> Authenticate(HttpRequest request)
+    {
+        var authResult = await AuthenticateUser(request);
+
+        return authResult;
     }
 
-    private static ClaimsPrincipal ParseUser(HttpRequest req)
+    public AuthResult Authorize(HttpRequest request)
     {
-        ClientPrincipal principal = new(String.Empty, String.Empty, String.Empty, Array.Empty<string>());
+        var authResult = AuthorizeUser(request);
 
-        if (req.Headers.TryGetValue("x-ms-client-principal", out var header))
+        return authResult;
+    }
+
+    private async Task<AuthResult> AuthenticateUser(HttpRequest req)
+    {
+
+        string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+        var authRequest = JsonConvert.DeserializeObject<AuthRequest>(requestBody);
+
+        if (authRequest != null && AuthorizedUsers.Contains(authRequest.UserName))
         {
-            var data = header[0];
-            var decoded = Convert.FromBase64String(data);
-            var json = Encoding.UTF8.GetString(decoded);
-            principal = JsonSerializer.Deserialize<ClientPrincipal>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? throw new InvalidOperationException("Unable to parse the HTTP request header x-ms-client-principal into a ClientPrincipal instance.");
+            return new AuthResult(authRequest.UserName, true, Base64Encode(authRequest.UserName));
         }
 
-        principal = principal with { UserRoles = principal.UserRoles.Except(new[] { "anonymous" }, StringComparer.OrdinalIgnoreCase) ?? throw new InvalidOperationException() };
+        return new AuthResult(string.Empty, false, string.Empty);
+    }
 
-        if (!principal.UserRoles.Any())
+
+    private AuthResult AuthorizeUser(HttpRequest request)
+    {
+        if (request.Headers.TryGetValue("x-tis-auth-token", out var header))
         {
-            return new ClaimsPrincipal();
+            var token = header[0];
+            var userName = Base64Decode(token);
+
+            if (AuthorizedUsers.Contains(userName))
+            {
+                return new AuthResult(userName, true, token);
+            }
         }
 
-        var identity = new ClaimsIdentity(principal.IdentityProvider);
-        identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, principal.UserId));
-        identity.AddClaim(new Claim(ClaimTypes.Name, principal.UserDetails));
-        identity.AddClaims(principal.UserRoles.Select(r => new Claim(ClaimTypes.Role, r)));
+        return new AuthResult(string.Empty, false, string.Empty);
+    }
 
-        return new ClaimsPrincipal(identity);
+    private static string Base64Encode(string plainText)
+    {
+        var plainTextBytes = Encoding.UTF8.GetBytes(plainText);
+        return Convert.ToBase64String(plainTextBytes);
+    }
+
+    private static string Base64Decode(string base64Text)
+    {
+        var decoded = Convert.FromBase64String(base64Text);
+        return Encoding.UTF8.GetString(decoded);
     }
 }

@@ -3,6 +3,7 @@ import { StorageItemKey } from './enum';
 export interface CurrentUser {
   userName: string;
   isAuthenticated: boolean;
+  token: string;
 }
 
 // export interface CurrentUser {
@@ -20,6 +21,7 @@ export interface AuthRequest {
 export interface AuthResult {
   userName: string;
   isAuthenticated: boolean;
+  token: string;
 }
 
 export interface StorageItem {

@@ -37,7 +37,7 @@ public class ListItemFunctions
             return await Task.FromResult<ActionResult>(new UnauthorizedResult());
         }
 
-        var listItems = await _listItemService.GetListItems(authResult?.User?.Identity?.Name ?? "Unknown");
+        var listItems = await _listItemService.GetListItems(authResult?.UserName ?? "Unknown");
 
         return await Task.FromResult<ActionResult>(new OkObjectResult(listItems));
     }
@@ -64,7 +64,7 @@ public class ListItemFunctions
             return await Task.FromResult<IActionResult>(new BadRequestObjectResult("Invalid request body. Must be a valid ListItem."));
         }
 
-        var userListItems = await _listItemService.AddListItem(authResult.User.Identity?.Name ?? "Unknown", itemToAdd);
+        var userListItems = await _listItemService.AddListItem(authResult?.UserName ?? "Unknown", itemToAdd);
 
         return new CreatedResult($"{req.Scheme}://{req.Host}/api/GetListItems", userListItems);
     }
@@ -93,7 +93,7 @@ public class ListItemFunctions
             return await Task.FromResult<IActionResult>(new BadRequestObjectResult("Invalid request body. Must be a valid ListItem."));
         }
 
-        var userListItems = await _listItemService.UpdateListItem(authResult.User.Identity?.Name ?? "Unknown", itemToUpdate);
+        var userListItems = await _listItemService.UpdateListItem(authResult?.UserName ?? "Unknown", itemToUpdate);
 
         return await Task.FromResult<ActionResult>(new OkObjectResult(userListItems));
     }
@@ -119,7 +119,7 @@ public class ListItemFunctions
             return await Task.FromResult<ActionResult>(new OkResult());
         }
 
-        var userListItems = await _listItemService.DeleteListItem(authResult.User.Identity?.Name ?? "Unknown", itemDescription);
+        var userListItems = await _listItemService.DeleteListItem(authResult?.UserName ?? "Unknown", itemDescription);
 
         return await Task.FromResult<ActionResult>(new OkObjectResult(userListItems));
     }

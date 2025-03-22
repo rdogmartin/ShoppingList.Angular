@@ -72,12 +72,12 @@ Or use the shortcut defined in `package.json`:
 1. In the Azure Portal, navigate to the Configuration page for your Static Web App. Create four new application settings
    with the following names and values:
 
-   - `BingSearch__EndPointUrl` - The URL of your Bing Search service. Find it on the Keys and Endpoint page of your Bing Search
+   - `BingSearch__EndpointUrl` - The URL of your Bing Search service. Find it on the Keys and Endpoint page of your Bing Search
      service.
    - `BingSearch__SubscriptionKey` - Your Bing Search subscription key. Find it on the Keys and Endpoint page of your Bing
      Search service.
    - `CosmosDb__AuthorizationKey` - Your Cosmos DB authorization key. Find it on the Keys page of your Cosmos DB database.
-   - `CosmosDb__EndPointUrl` - Your Cosmos DB endpoint URI. Find it on the Keys page of your Cosmos DB database.
+   - `CosmosDb__EndpointUrl` - Your Cosmos DB endpoint URI. Find it on the Keys page of your Cosmos DB database.
 
    ![Azure Static Web App configuration](readme-images/sl-azure-config.jpg)
 

@@ -16,7 +16,7 @@ public class Startup : FunctionsStartup
 {
     private static readonly IConfigurationRoot Configuration = new ConfigurationBuilder()
         .SetBasePath(Environment.CurrentDirectory)
-        .AddJsonFile("appSettings.json", optional: false, reloadOnChange: true)
+        .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
         .AddUserSecrets<Startup>()
         .AddEnvironmentVariables()
         .Build();
@@ -32,10 +32,10 @@ public class Startup : FunctionsStartup
 
     private static CosmosClient GetCosmosClient()
     {
-        string endpoint = Configuration["CosmosDb:EndPointUrl"];
+        string endpoint = Configuration["CosmosDb:EndpointUrl"];
         if (string.IsNullOrEmpty(endpoint) || endpoint.StartsWith("Put actual key in secrets.json"))
         {
-            throw new ConfigurationErrorsException("Missing setting 'CosmosDb:EndPointUrl'. Please specify a valid endpoint in the appSettings.json file or your Azure Functions Settings.");
+            throw new ConfigurationErrorsException("Missing setting 'CosmosDb:EndpointUrl'. Please specify a valid endpoint in the appSettings.json file or your Azure Functions Settings.");
         }
 
         string authKey = Configuration["CosmosDb:AuthorizationKey"];

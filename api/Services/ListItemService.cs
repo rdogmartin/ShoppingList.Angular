@@ -95,7 +95,7 @@ public class ListItemService : IListItemService
 
             if (string.IsNullOrEmpty(configValue) || configValue.StartsWith("Put actual key in secrets.json"))
             {
-                throw new ConfigurationErrorsException("Missing setting 'BingSearch:EndpointUrl'. Please specify a valid subscription key in the appSettings.json file or your Azure Functions Settings.");
+                throw new ConfigurationErrorsException("Missing setting 'BingSearch:EndpointUrl'. Please specify a valid URL in the appSettings.json file or your Azure Functions Settings.");
             }
             return configValue;
         }

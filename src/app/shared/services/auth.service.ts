@@ -18,7 +18,11 @@ export class AuthService {
     const authRequest = { userName: userName };
     return this.http.post<AuthResult>('/api/authenticate', authRequest).pipe(
       tap((authResult) => {
-        this.setCurrentUser({ userName: authResult.userName, isAuthenticated: authResult.isAuthenticated });
+        this.setCurrentUser({
+          userName: authResult.userName,
+          isAuthenticated: authResult.isAuthenticated,
+          token: authResult.token,
+        });
       }),
     );
   }
@@ -26,7 +30,7 @@ export class AuthService {
   public getCurrentUser() {
     return this.browserLocalStorageService
       .select<CurrentUser>(StorageItemKey.CurrentUser)
-      .pipe(map((value) => (value === null ? { userName: '', isAuthenticated: false } : value)));
+      .pipe(map((value) => (value === null ? { userName: '', isAuthenticated: false, token: '' } : value)));
   }
 
   public setCurrentUser(currentUser: CurrentUser) {
