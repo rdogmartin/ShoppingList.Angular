@@ -1,3 +1,14 @@
-<header class="p-2 pb-0">
+<header class="p-2 pb-0 flex justify-between">
   <h1>My Shopping List</h1>
+  @if (isLoggedIn()) {
+  <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Menu options">
+    <mat-icon>more_vert</mat-icon>
+  </button>
+  <mat-menu #menu="matMenu">
+    <button mat-menu-item (click)="logout()">
+      <mat-icon>exit_to_app</mat-icon>
+      Log out
+    </button>
+  </mat-menu>
+  }
 </header>
