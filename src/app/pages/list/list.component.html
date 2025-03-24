@@ -1,10 +1,10 @@
+@if (isLoggedIn()) {
 <form [formGroup]="listForm" (ngSubmit)="onSubmit()">
   <div class="flex items-start">
     <mat-icon class="ml-2 mt-3 mr-2 mb-5">add</mat-icon>
     <input type="text" class="w-full h-12 p-3 bg-transparent border-none" formControlName="newItem" placeholder="Add an item" value="" [cdkTrapFocusAutoCapture]="true" [cdkTrapFocus]="true" enterkeyhint="done" (focus)="onFocusAddListItem()">
   </div>
 </form>
-
 @if (listItems()) {
 @for (listItem of listItems(); track listItem.description) {
 <div class="flex items-center hover:bg-neutral-100 dark:hover:bg-neutral-700 focus-within:bg-neutral-100 dark:focus-within:bg-neutral-700" [ngClass]="[listItem.isComplete ? 'completed' : 'incomplete', listItem.isBeingEdited ? 'item-container-active' : '']">
@@ -32,4 +32,5 @@
 <div class="pl-2 my-10 text-red-950 bg-rose-400">
   An error occurred.
 </div>
+}
 }

@@ -17,7 +17,15 @@ public interface IAuthService
 
 public class AuthService : IAuthService
 {
-    List<string> AuthorizedUsers => new List<string>() { "***REMOVED***", "***REMOVED***", "***REMOVED***" };
+    static List<string> AuthorizedUsers => new() {
+        "***REMOVED***",
+        "***REMOVED***",
+        "***REMOVED***m",
+        "***REMOVED***",
+        "***REMOVED***",
+        "***REMOVED***",
+        "***REMOVED***"
+    };
 
     public async Task<AuthResult> Authenticate(HttpRequest request)
     {
@@ -33,7 +41,7 @@ public class AuthService : IAuthService
         return authResult;
     }
 
-    private async Task<AuthResult> AuthenticateUser(HttpRequest req)
+    private static async Task<AuthResult> AuthenticateUser(HttpRequest req)
     {
 
         string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
@@ -48,7 +56,7 @@ public class AuthService : IAuthService
     }
 
 
-    private AuthResult AuthorizeUser(HttpRequest request)
+    private static AuthResult AuthorizeUser(HttpRequest request)
     {
         if (request.Headers.TryGetValue("x-tis-auth-token", out var header))
         {

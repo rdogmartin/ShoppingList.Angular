@@ -3,7 +3,7 @@
   <p class="pl-1">
     @if (!model.user.isAuthenticated) {
   <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-    <div class="flex items-start">
+    <div class="flex items-center">
       <input type="text" class="h-12 p-3 text-black" formControlName="userName" placeholder="Type email address" value="" [cdkTrapFocusAutoCapture]="true" [cdkTrapFocus]="true" enterkeyhint="done">
       <button mat-flat-button color="primary" class="ml-2">Log in</button>
     </div>
@@ -15,7 +15,7 @@
   </p>
   @if (model.user.isAuthenticated) {
   <p class="pl-1">
-    Logged in as {{model.user.userName}}<button mat-button class="m-2 p-1" (click)="logout()">Log out</button>
+    Logged in as {{model.user.userName}}<button mat-flat-button color="primary" class="m-2 p-1" (click)="logout()">Log out</button>
   </p>
   }
 </footer>

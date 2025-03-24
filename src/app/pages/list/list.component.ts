@@ -39,6 +39,10 @@ export class ListComponent implements OnInit, OnDestroy {
       requireSync: false,
     },
   );
+  public isLoggedIn = toSignal(this.authService.isLoggedIn$, {
+    initialValue: false,
+    rejectErrors: true,
+  });
 
   public listForm!: FormGroup<{
     newItem: FormControl<string | null>;

@@ -28,24 +28,4 @@ public class AppInfoFunction
 
         return Task.FromResult<IActionResult>(new OkObjectResult(apiInfo));
     }
-
-    //[FunctionName("Hello")]
-    //public static async Task<IActionResult> Run(
-    //    [HttpTrigger(AuthorizationLevel.Anonymous, "get", "post", Route = null)] HttpRequest req,
-    //    ILogger log)
-    //{
-    //  log.LogInformation("Hello endpoint triggered.");
-
-    //  string name = req.Query["name"];
-
-    //  string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
-    //  dynamic data = JsonConvert.DeserializeObject(requestBody);
-    //  name = name ?? data?.name;
-
-    //  string responseMessage = string.IsNullOrEmpty(name)
-    //      ? "This HTTP triggered function executed successfully. Pass a name in the query string or in the request body for a personalized response."
-    //      : $"Hello, {name}. This HTTP triggered function executed successfully.";
-
-    //  return new OkObjectResult(responseMessage);
-    //}
 }
