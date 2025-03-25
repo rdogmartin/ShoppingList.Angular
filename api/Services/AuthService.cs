@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Api.Dto;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 
 namespace api.Services;
@@ -17,15 +18,14 @@ public interface IAuthService
 
 public class AuthService : IAuthService
 {
-    static List<string> AuthorizedUsers => new() {
-        "***REMOVED***",
-        "***REMOVED***",
-        "***REMOVED***m",
-        "***REMOVED***",
-        "***REMOVED***",
-        "***REMOVED***",
-        "***REMOVED***"
-    };
+    private readonly IConfiguration _configuration;
+    private readonly List<string> _authorizedUserNames;
+
+    public AuthService(IConfiguration configuration)
+    {
+        _configuration = configuration;
+        _authorizedUserNames = _configuration.GetSection("AuthorizedUserNames").Get<List<string>>();
+    }
 
     public async Task<AuthResult> Authenticate(HttpRequest request)
     {
@@ -41,13 +41,13 @@ public class AuthService : IAuthService
         return authResult;
     }
 
-    private static async Task<AuthResult> AuthenticateUser(HttpRequest req)
+    private async Task<AuthResult> AuthenticateUser(HttpRequest req)
     {
 
         string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
         var authRequest = JsonConvert.DeserializeObject<AuthRequest>(requestBody);
 
-        if (authRequest != null && AuthorizedUsers.Contains(authRequest.UserName))
+        if (authRequest != null && _authorizedUserNames.Contains(authRequest.UserName))
         {
             return new AuthResult(authRequest.UserName, true, Base64Encode(authRequest.UserName));
         }
@@ -56,14 +56,14 @@ public class AuthService : IAuthService
     }
 
 
-    private static AuthResult AuthorizeUser(HttpRequest request)
+    private AuthResult AuthorizeUser(HttpRequest request)
     {
         if (request.Headers.TryGetValue("x-tis-auth-token", out var header))
         {
             var token = header[0];
             var userName = Base64Decode(token);
 
-            if (AuthorizedUsers.Contains(userName))
+            if (_authorizedUserNames.Contains(userName))
             {
                 return new AuthResult(userName, true, token);
             }
