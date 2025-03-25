@@ -73,7 +73,8 @@ Or use the shortcut defined in `package.json`:
 1. In the Azure Portal, navigate to the Configuration page for your Static Web App. Create four new application settings
    with the following names and values:
 
-   - `AuthorizedUserNames` - A comma-separated list of email addresses that are allowed to log in.
+   - `AuthorizedUserNames` - A list of usernames who are allowed to log in. In `appsettings.json` and `secrets.json`, this is
+     a comma-separated list of strings. In the Azure Static Web App configuration, each username is a separate entry with `__X` appended to the name, where `X` is a number starting at 0. For example, `AuthorizedUserNames__0`, `AuthorizedUserNames__1`, etc.
    - `BingSearch__EndpointUrl` - The URL of your Bing Search service. Find it on the Keys and Endpoint page of your Bing Search
      service.
    - `BingSearch__SubscriptionKey` - Your Bing Search subscription key. Find it on the Keys and Endpoint page of your Bing
