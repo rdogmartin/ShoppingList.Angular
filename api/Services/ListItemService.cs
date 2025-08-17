@@ -125,7 +125,7 @@ public class ListItemService : IListItemService
 
         if (listItem == null)
         {
-            listItem = new ListItem(itemToAdd.Description, await GetThumbnailImageUrl(itemToAdd.Description), false);
+            listItem = new ListItem(itemToAdd.Description, GetThumbnailImageUrl(itemToAdd.Description), false);
         }
         else
         {
@@ -176,7 +176,7 @@ public class ListItemService : IListItemService
         else
         {
             // Item is being updated, but not checked/unchecked. Keep it in the same place in the list and update the description & image URL.
-            var thumbnailUrl = await GetThumbnailImageUrl(itemToUpdate.NewDescription);
+            var thumbnailUrl = GetThumbnailImageUrl(itemToUpdate.NewDescription);
             updatedListItems = userListItems.ListItems
                 .Select(listItem => listItem == dbItemToUpdate ? dbItemToUpdate with { Description = itemToUpdate.NewDescription, ImageUrl = thumbnailUrl } : listItem) // Update the description and image URL of the item we're updating.
                 .GroupBy(listItem => new { Item1 = listItem.Description.ToUpperInvariant(), Item2 = listItem.ImageUrl.ToUpperInvariant() })
@@ -210,25 +210,28 @@ public class ListItemService : IListItemService
         return response.Resource;
     }
 
-    private async Task<string> GetThumbnailImageUrl(string itemDescription)
+    private string GetThumbnailImageUrl(string itemDescription)
     {
-        // More info: https://learn.microsoft.com/en-us/bing/search-apis/bing-image-search/reference/query-parameters
-        var uriQuery = $"{BingSearchEndpointUrl}?q={Uri.EscapeDataString(itemDescription)}&count=1";
+        return string.Empty;
 
-        using HttpClient client = new HttpClient();
-        client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BingSearchSubscriptionKey);
-        HttpResponseMessage response = await client.GetAsync(uriQuery);
-        string json = await response.Content.ReadAsStringAsync();
+        //// OBSOLETE: Microsoft discontinued the Bing Image Search API on August 11, 2025. Invoking the endpoint now returns this message:
+        //// "The requested API endpoint is no longer available. This Bing service has been retired. More information at https://aka.ms/BingAPIsRetirement."
+        //var uriQuery = $"{BingSearchEndpointUrl}?q={Uri.EscapeDataString(itemDescription)}&count=1";
 
-        if (string.IsNullOrWhiteSpace(json))
-        {
-            return string.Empty;
-        }
+        //using HttpClient client = new HttpClient();
+        //client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BingSearchSubscriptionKey);
+        //HttpResponseMessage response = await client.GetAsync(uriQuery);
+        //string json = await response.Content.ReadAsStringAsync();
 
-        dynamic parsedJson = JsonConvert.DeserializeObject(json)!;
-        var thumbnailUrl = parsedJson.value[0].thumbnailUrl;
+        //if (string.IsNullOrWhiteSpace(json))
+        //{
+        //    return string.Empty;
+        //}
 
-        return thumbnailUrl;
+        //dynamic parsedJson = JsonConvert.DeserializeObject(json)!;
+        //var thumbnailUrl = parsedJson.value[0].thumbnailUrl;
+
+        //return thumbnailUrl;
     }
 
     private async Task<UserListItems> InsertNewUser(string userId)

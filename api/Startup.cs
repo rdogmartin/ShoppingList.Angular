@@ -23,6 +23,7 @@ public class Startup : FunctionsStartup
 
     public override void Configure(IFunctionsHostBuilder builder)
     {
+        builder.Services.AddSingleton<IConfiguration>(Configuration);
         builder.Services.AddScoped<IAppInfoService, AppInfoService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IListItemService, ListItemService>();

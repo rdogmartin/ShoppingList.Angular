@@ -24,7 +24,7 @@ public class AuthService : IAuthService
     public AuthService(IConfiguration configuration)
     {
         _configuration = configuration;
-        _authorizedUserNames = _configuration.GetSection("AuthorizedUserNames").Get<List<string>>();
+        _authorizedUserNames = _configuration.GetSection("AuthorizedUserNames").Get<List<string>>() ?? new List<string>();
     }
 
     public async Task<AuthResult> Authenticate(HttpRequest request)
