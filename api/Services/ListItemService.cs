@@ -66,36 +66,34 @@ public class ListItemService : IListItemService
     }
 
     /// <summary>
-    /// Gets the Bing Search subscription key. This should match one of the keys on the Resource Management => Keys and Endpoint tab in the Bing Search area of the Azure Portal.
-    /// Ex: 1234567890abcdef1234567890abcdef
+    /// Gets the Image Search API key.
     /// </summary>
-    public string BingSearchSubscriptionKey
+    public string ImageSearchApiKey
     {
         get
         {
-            var configValue = _configuration["BingSearch:SubscriptionKey"];
+            var configValue = _configuration["ImageSearch:ApiKey"];
 
             if (string.IsNullOrEmpty(configValue) || configValue.StartsWith("Put actual key in secrets.json"))
             {
-                throw new ConfigurationErrorsException("Missing setting 'BingSearch:SubscriptionKey'. Please specify a valid subscription key in the appSettings.json file or your Azure Functions Settings.");
+                throw new ConfigurationErrorsException("Missing setting 'ImageSearch:ApiKey'. Please specify a valid API key in the appSettings.json file or your Azure Functions Settings.");
             }
             return configValue;
         }
     }
 
     /// <summary>
-    /// Gets the Bing Search endpoint URL. This should match the endpoint on the Resource Management => Endpoint tab in the Bing Search area of the Azure Portal.
-    /// Ex: https://api.bing.microsoft.com/v7.0/images/search
+    /// Gets the Image Search endpoint URL. Ex: https://serpapi.com/search.json
     /// </summary>
-    public string BingSearchEndpointUrl
+    public string ImageSearchEndpointUrl
     {
         get
         {
-            var configValue = _configuration["BingSearch:EndpointUrl"];
+            var configValue = _configuration["ImageSearch:EndpointUrl"];
 
             if (string.IsNullOrEmpty(configValue) || configValue.StartsWith("Put actual key in secrets.json"))
             {
-                throw new ConfigurationErrorsException("Missing setting 'BingSearch:EndpointUrl'. Please specify a valid URL in the appSettings.json file or your Azure Functions Settings.");
+                throw new ConfigurationErrorsException("Missing setting 'ImageSearch:EndpointUrl'. Please specify a valid URL in the appSettings.json file or your Azure Functions Settings.");
             }
             return configValue;
         }
@@ -125,7 +123,7 @@ public class ListItemService : IListItemService
 
         if (listItem == null)
         {
-            listItem = new ListItem(itemToAdd.Description, GetThumbnailImageUrl(itemToAdd.Description), false);
+            listItem = new ListItem(itemToAdd.Description, await GetThumbnailImageUrl(itemToAdd.Description), false);
         }
         else
         {
@@ -176,7 +174,7 @@ public class ListItemService : IListItemService
         else
         {
             // Item is being updated, but not checked/unchecked. Keep it in the same place in the list and update the description & image URL.
-            var thumbnailUrl = GetThumbnailImageUrl(itemToUpdate.NewDescription);
+            var thumbnailUrl = await GetThumbnailImageUrl(itemToUpdate.NewDescription);
             updatedListItems = userListItems.ListItems
                 .Select(listItem => listItem == dbItemToUpdate ? dbItemToUpdate with { Description = itemToUpdate.NewDescription, ImageUrl = thumbnailUrl } : listItem) // Update the description and image URL of the item we're updating.
                 .GroupBy(listItem => new { Item1 = listItem.Description.ToUpperInvariant(), Item2 = listItem.ImageUrl.ToUpperInvariant() })
@@ -210,28 +208,25 @@ public class ListItemService : IListItemService
         return response.Resource;
     }
 
-    private string GetThumbnailImageUrl(string itemDescription)
+    private async Task<string> GetThumbnailImageUrl(string itemDescription)
     {
-        return string.Empty;
+        // Originally we used Bing Image Search. That was discontinued 8/11/25 and was replaced with SerpApi.
+        // https://serpapi.com/blog/bing-search-api-replacement-web-search/
+        var uriQuery = $"{ImageSearchEndpointUrl}?q={Uri.EscapeDataString(itemDescription)}&count=1&mkt=en-US&api_key={ImageSearchApiKey}";
 
-        //// OBSOLETE: Microsoft discontinued the Bing Image Search API on August 11, 2025. Invoking the endpoint now returns this message:
-        //// "The requested API endpoint is no longer available. This Bing service has been retired. More information at https://aka.ms/BingAPIsRetirement."
-        //var uriQuery = $"{BingSearchEndpointUrl}?q={Uri.EscapeDataString(itemDescription)}&count=1";
+        using HttpClient client = new HttpClient();
+        HttpResponseMessage response = await client.GetAsync(uriQuery);
+        string json = await response.Content.ReadAsStringAsync();
 
-        //using HttpClient client = new HttpClient();
-        //client.DefaultRequestHeaders.Add("Ocp-Apim-Subscription-Key", BingSearchSubscriptionKey);
-        //HttpResponseMessage response = await client.GetAsync(uriQuery);
-        //string json = await response.Content.ReadAsStringAsync();
+        if (string.IsNullOrWhiteSpace(json))
+        {
+            return string.Empty;
+        }
 
-        //if (string.IsNullOrWhiteSpace(json))
-        //{
-        //    return string.Empty;
-        //}
+        dynamic parsedJson = JsonConvert.DeserializeObject(json)!;
+        var thumbnailUrl = parsedJson.immersive_products[0].thumbnail;
 
-        //dynamic parsedJson = JsonConvert.DeserializeObject(json)!;
-        //var thumbnailUrl = parsedJson.value[0].thumbnailUrl;
-
-        //return thumbnailUrl;
+        return thumbnailUrl;
     }
 
     private async Task<UserListItems> InsertNewUser(string userId)
