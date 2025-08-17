@@ -211,8 +211,10 @@ public class ListItemService : IListItemService
     private async Task<string> GetThumbnailImageUrl(string itemDescription)
     {
         // Originally we used Bing Image Search. That was discontinued 8/11/25 and was replaced with SerpApi.
-        // https://serpapi.com/blog/bing-search-api-replacement-web-search/
-        var uriQuery = $"{ImageSearchEndpointUrl}?q={Uri.EscapeDataString(itemDescription)}&count=1&mkt=en-US&api_key={ImageSearchApiKey}";
+        // Free plan allows 250 searchs per month.
+        // Documentation: https://serpapi.com/bing-images-api
+        // Playground: https://serpapi.com/playground?engine=bing_images&q=Coffee
+        var uriQuery = $"{ImageSearchEndpointUrl}?engine=bing_images&q={Uri.EscapeDataString(itemDescription)}&count=1&mkt=en-US&api_key={ImageSearchApiKey}";
 
         using HttpClient client = new HttpClient();
         HttpResponseMessage response = await client.GetAsync(uriQuery);
@@ -224,7 +226,7 @@ public class ListItemService : IListItemService
         }
 
         dynamic parsedJson = JsonConvert.DeserializeObject(json)!;
-        var thumbnailUrl = parsedJson.immersive_products[0].thumbnail;
+        var thumbnailUrl = parsedJson.images_results[0].thumbnail;
 
         return thumbnailUrl;
     }
